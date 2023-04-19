@@ -17,7 +17,7 @@ import {
   ChevronDownIcon,
 } from "@chakra-ui/icons";
 import { Link } from "react-router-dom";
-import { useTranslation } from "../translations";
+import { useTranslation } from "../../shared/translations";
 
 export const Header: React.FC = () => {
   const { t, selectLanguage, selectedLanguage } = useTranslation();

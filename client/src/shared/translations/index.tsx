@@ -1,7 +1,6 @@
 import { createContext, useState, PropsWithChildren, useContext } from "react";
-import translations from "./translations.json";
 
-type Language = "uk" | "ru";
+type Language = string;
 
 interface Context {
   selectedLanguage: Language;
@@ -15,13 +14,20 @@ const context = createContext<Context>({
   t: () => "",
 });
 
-export const TranslationsProvider: React.FC<PropsWithChildren> = ({
-  children,
-}) => {
-  const [selectedLanguage, setSelectedLanguage] = useState<Language>("uk");
+interface Provider {
+  initialLanguage: Language;
+  translations: Record<Language, object>;
+}
 
-  const selectLanguage = (language: Language) =>
-    setSelectedLanguage((l) => (l === "uk" ? "ru" : "uk"));
+export const TranslationsProvider: React.FC<PropsWithChildren<Provider>> = ({
+  children,
+  translations,
+  initialLanguage,
+}) => {
+  const [selectedLanguage, setSelectedLanguage] =
+    useState<Language>(initialLanguage);
+
+  const selectLanguage = (language: Language) => setSelectedLanguage(language);
 
   const t = function (key: string) {
     const selectedLanguageTranslations: any =
