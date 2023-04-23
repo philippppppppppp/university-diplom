@@ -1,5 +1,6 @@
 const { resolve } = require("path");
 const WebpackShellPluginNext = require("webpack-shell-plugin-next");
+const Dotenv = require("dotenv-webpack");
 
 const { NODE_ENV = "production" } = process.env;
 
@@ -18,6 +19,7 @@ module.exports = {
     ],
   },
   plugins: [
+    new Dotenv(),
     new WebpackShellPluginNext({
       onBuildEnd: {
         scripts: ["nodemon ./build"],
