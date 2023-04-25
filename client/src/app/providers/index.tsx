@@ -3,9 +3,17 @@ import { TranslationsProvider } from "./translations";
 import { Compose } from "../../shared/compose";
 import { PropsWithChildren, FC } from "react";
 import { StylesProvider } from "./styles";
+import { AuthProvider } from "./auth";
 
 export const ComposedProviders: FC<PropsWithChildren> = ({ children }) => (
-  <Compose components={[ApiProvider, TranslationsProvider, StylesProvider]}>
+  <Compose
+    components={[
+      ApiProvider,
+      TranslationsProvider,
+      StylesProvider,
+      AuthProvider,
+    ]}
+  >
     {children}
   </Compose>
 );

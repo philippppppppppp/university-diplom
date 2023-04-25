@@ -1,11 +1,8 @@
-import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
+import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import { PropsWithChildren, FC } from "react";
 
-const client = new ApolloClient({
-  uri: process.env.REACT_APP_GRAPHQL_URI,
-  cache: new InMemoryCache(),
-});
+const client = new QueryClient();
 
 export const ApiProvider: FC<PropsWithChildren> = ({ children }) => (
-  <ApolloProvider client={client}>{children}</ApolloProvider>
+  <QueryClientProvider client={client}>{children}</QueryClientProvider>
 );

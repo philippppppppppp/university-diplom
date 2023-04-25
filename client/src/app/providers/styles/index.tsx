@@ -1,6 +1,12 @@
 import { PropsWithChildren, FC } from "react";
-import { ChakraProvider } from "@chakra-ui/react";
+import { ChakraProvider, ToastProviderProps } from "@chakra-ui/react";
+
+const toastOptions: ToastProviderProps = {
+  defaultOptions: { position: "top" },
+};
 
 export const StylesProvider: FC<PropsWithChildren> = ({ children }) => (
-  <ChakraProvider resetCSS>{children}</ChakraProvider>
+  <ChakraProvider resetCSS toastOptions={toastOptions}>
+    {children}
+  </ChakraProvider>
 );
