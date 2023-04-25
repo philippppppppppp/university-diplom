@@ -1,1 +1,1 @@
-export { AuthButton } from "./ui/AuthButton";
+export { AuthPopUp } from "./ui/AuthPopUp";

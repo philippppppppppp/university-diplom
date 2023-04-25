@@ -10,6 +10,9 @@
     "password": "Пароль",
     "profile": "Профіль",
     "logout": "Вийти",
+    "invalidEmail": "Некоректна електронна пошта",
+    "passwordLength": "Довжина пароля від {{ min }} до {{ max }} символів",
+    "loginRequiredFields": "Пошта та пароль обов'язкові поля",
     "INVALID_CREDENTIALS": "Невірний логін або пароль"
   },
   "ru": {
@@ -23,6 +26,9 @@
     "password": "Пароль",
     "profile": "Профиль",
     "logout": "Выйти",
+    "invalidEmail": "Некоректная электронная почта",
+    "passwordLength": "Длина пароля от {{ min }} до {{ max }} символов",
+    "loginRequiredFields": "Почта и пароль обязательные поля",
     "INVALID_CREDENTIALS": "Неверный логин или пароль"
   }
 }
