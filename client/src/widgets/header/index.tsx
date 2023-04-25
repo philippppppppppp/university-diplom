@@ -18,6 +18,7 @@ import {
 } from "@chakra-ui/icons";
 import { Link } from "react-router-dom";
 import { useTranslation } from "../../shared/translations";
+import { AuthButton } from "../../features/auth";
 
 export const Header: React.FC = () => {
   const { t, selectLanguage, selectedLanguage } = useTranslation();
@@ -79,6 +80,7 @@ export const Header: React.FC = () => {
                 </MenuItem>
               </MenuList>
             </Menu>
+            <AuthButton />
           </Flex>
         </Flex>
       </Container>
