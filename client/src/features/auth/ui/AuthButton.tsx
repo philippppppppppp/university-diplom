@@ -14,11 +14,11 @@ import {
   PopoverTrigger,
   Text,
 } from "@chakra-ui/react";
-import { useTranslation } from "../../shared/translations";
+import { useTranslation } from "../../../shared/translations";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import { Link } from "react-router-dom";
 import { Formik, Form, Field } from "formik";
-import { useAuth, Credentials } from "../../shared/auth";
+import { useAuth, Credentials } from "../../../shared/auth";
 
 const initialValues: Credentials = {
   email: "",
