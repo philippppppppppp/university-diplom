@@ -10,7 +10,7 @@ const add = (token: string, userId: string) => {
 };
 
 const find = (token: string) => {
-  refreshTokens.find((t) => t.token === token);
+  return refreshTokens.find((t) => t.token === token);
 };
 
 const remove = (token: string) => {
