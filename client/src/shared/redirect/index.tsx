@@ -15,9 +15,18 @@ export const useRedirect = () => {
   return redirect;
 };
 
-type Props = Omit<LinkProps, "state">;
+type Props = Omit<LinkProps, "state"> & { forward?: boolean };
 
-export const RedirectLink: React.FC<Props> = forwardRef((props, ref) => {
-  const { pathname } = useLocation();
-  return <Link {...props} state={{ [redirectKey]: pathname }} ref={ref} />;
-});
+export const RedirectLink: React.FC<Props> = forwardRef(
+  ({ forward, ...props }, ref) => {
+    const { pathname, state } = useLocation();
+    const redirectToForward = state?.[redirectKey];
+    return (
+      <Link
+        {...props}
+        state={{ [redirectKey]: forward ? redirectToForward : pathname }}
+        ref={ref}
+      />
+    );
+  }
+);
