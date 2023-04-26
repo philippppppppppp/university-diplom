@@ -1,10 +1,10 @@
 import { Box, Flex, Text } from "@chakra-ui/react";
-import { LoginForm } from "../../features/auth";
 import { MinimalHeader } from "../../widgets/header";
 import { RedirectLink, useRedirect } from "../../shared/redirect";
+import { RegisterForm } from "../../features/auth";
 import { useTranslation } from "../../shared/translations";
 
-export const LoginPage: React.FC = () => {
+export const RegisterPage: React.FC = () => {
   const redirect = useRedirect();
   const { t } = useTranslation();
 
@@ -21,16 +21,16 @@ export const LoginPage: React.FC = () => {
           direction="column"
           gap="2"
         >
-          <LoginForm onLoginSuccess={redirect} />
+          <RegisterForm onRegisterSuccess={redirect} />
           <Text
             textDecor="underline"
             fontSize="14"
-            as={RedirectLink}
-            to="/register"
             alignSelf="center"
+            as={RedirectLink}
+            to="/login"
             forward
           >
-            {t("register")}
+            {t("login")}
           </Text>
         </Flex>
       </Flex>

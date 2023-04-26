@@ -29,6 +29,9 @@ interface TokenResponse {
 }
 
 const authClient: Client = {
+  async register(registerData) {
+    await instance.post<ResponseData>("/register", registerData);
+  },
   async login(credentials) {
     const { data } = await instance.post<ResponseData<TokenResponse>>(
       "/login",

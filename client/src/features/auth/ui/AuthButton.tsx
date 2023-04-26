@@ -1,12 +1,14 @@
 import { FC, useRef } from "react";
 import {
   Button,
+  Flex,
   Popover,
   PopoverArrow,
   PopoverBody,
   PopoverContent,
   PopoverHeader,
   PopoverTrigger,
+  Text,
 } from "@chakra-ui/react";
 import { useTranslation } from "../../../shared/translations";
 import { useAuth } from "../../../shared/auth";
@@ -39,8 +41,17 @@ export const AuthButton: FC<Props> = ({ withPopUp }) => {
           <PopoverHeader fontWeight="700" textAlign="center">
             {t("login")}
           </PopoverHeader>
-          <PopoverBody>
+          <PopoverBody as={Flex} direction="column" gap="2">
             <LoginForm onSubmit={restoreFocus} />
+            <Text
+              textDecor="underline"
+              fontSize="14"
+              as={RedirectLink}
+              to="/register"
+              alignSelf="center"
+            >
+              {t("register")}
+            </Text>
           </PopoverBody>
         </PopoverContent>
       </Popover>

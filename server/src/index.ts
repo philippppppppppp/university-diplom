@@ -23,6 +23,10 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 
+app.post("/api/auth/register", async (req, res) => {
+  res.status(501).json({ status: "Error", message: "NOT_IMPLEMENTED" });
+});
+
 app.post("/api/auth/login", async (req, res) => {
   try {
     const { email, password } = req.body;

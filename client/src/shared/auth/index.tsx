@@ -15,14 +15,17 @@ export interface Credentials {
   password: string;
 }
 
+export type RegisterData = Credentials & { name: string };
+
 interface Auth {
   authToken: AuthToken;
   setAuthToken(authToken: AuthToken): void;
   authenticated: boolean;
   loggedOut: boolean;
-  login(credentials: Credentials): void;
-  refresh(): void;
-  logout(): void;
+  register(registerData: RegisterData): Promise<void>;
+  login(credentials: Credentials): Promise<void>;
+  refresh(): Promise<void>;
+  logout(): Promise<void>;
   loading: boolean;
 }
 
@@ -31,13 +34,15 @@ const context = createContext<Auth>({
   setAuthToken: () => {},
   authenticated: false,
   loggedOut: false,
+  register: async () => {},
   login: async () => {},
   refresh: async () => {},
-  logout: () => {},
+  logout: async () => {},
   loading: false,
 });
 
 export interface Client {
+  register(registerData: RegisterData): Promise<void>;
   login(credentials: Credentials): Promise<AuthToken>;
   refresh(): Promise<AuthToken>;
   logout(): Promise<void>;
@@ -55,6 +60,19 @@ export const AuthProvider: FC<PropsWithChildren<Props>> = ({
   const [loggedOut, setLoggedOut] = useState(false);
   const [loading, setLoading] = useState(false);
   const authenticated = !!authToken;
+
+  const register = useCallback(
+    async (registerData: RegisterData) => {
+      try {
+        await client.register(registerData);
+      } catch (err) {
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [client]
+  );
 
   const login = useCallback(
     async (credentials: Credentials) => {
@@ -105,6 +123,7 @@ export const AuthProvider: FC<PropsWithChildren<Props>> = ({
         setAuthToken,
         authenticated,
         loggedOut,
+        register,
         login,
         refresh,
         logout,

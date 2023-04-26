@@ -7,6 +7,7 @@ interface Props {
   type?: "email" | "text";
   name: string;
   disabled?: boolean;
+  autoComplete?: string;
 }
 
 export const FormInput: React.FC<Props> = ({ onClick, ...props }) => (

@@ -1,18 +1,24 @@
 import { Button, Flex } from "@chakra-ui/react";
 import { useTranslation } from "../../../shared/translations";
 import { Formik, Form, FormikHelpers } from "formik";
-import { useAuth, Credentials } from "../../../shared/auth";
+import { useAuth, RegisterData } from "../../../shared/auth";
 import { object, string } from "yup";
 import { FormInput, FormPasswordInput } from "../../../shared/ui";
 import { FormError } from "../../../shared/ui/FormError";
 
-const initialValues: Credentials = {
+type RegisterValues = RegisterData & { confirmPassword: string };
+
+const initialValues: RegisterValues = {
   email: "",
+  name: "",
   password: "",
+  confirmPassword: "",
 };
 
 const minPasswordLength = +(process.env.REACT_APP_MIN_PASSWORD_LENGTH ?? 6);
 const maxPasswordLength = +(process.env.REACT_APP_MAX_PASSWORD_LENGTH ?? 20);
+const minNameLength = +(process.env.REACT_APP_MIN_NAME_LENGTH ?? 2);
+const maxNameLength = +(process.env.REACT_APP_MAX_NAME_LENGTH ?? 30);
 
 const passwordLengthTranslationObject = {
   key: "passwordLength",
@@ -22,31 +28,52 @@ const passwordLengthTranslationObject = {
   },
 };
 
+const nameLengthTranslationObject = {
+  key: "nameLength",
+  interpolations: {
+    min: minNameLength,
+    max: maxNameLength,
+  },
+};
+
 const credentialsSchema = object({
-  email: string().email("invalidEmail").required("loginRequiredFields"),
+  email: string().email("invalidEmail").required("registerRequiredFields"),
+  name: string()
+    .min(minNameLength, nameLengthTranslationObject)
+    .max(maxNameLength, nameLengthTranslationObject)
+    .required("registerRequiredFields"),
   password: string()
     .min(minPasswordLength, passwordLengthTranslationObject)
     .max(maxPasswordLength, passwordLengthTranslationObject)
-    .required("loginRequiredFields"),
+    .required("registerRequiredFields"),
+  confirmPassword: string()
+    .min(minPasswordLength, passwordLengthTranslationObject)
+    .max(maxPasswordLength, passwordLengthTranslationObject)
+    .test("passwords match", "passwordsMatch", function (value) {
+      return this.parent.password === value;
+    })
+    .required("registerRequiredFields"),
 });
 
 interface Props {
   onSubmit?(): void;
-  onLoginSuccess?(): void;
-  isPopUp?: boolean;
+  onRegisterSuccess?(): void;
 }
 
-export const LoginForm: React.FC<Props> = ({ onSubmit, onLoginSuccess }) => {
-  const { login, loading } = useAuth();
+export const RegisterForm: React.FC<Props> = ({
+  onSubmit,
+  onRegisterSuccess,
+}) => {
+  const { loading, register } = useAuth();
   const { t } = useTranslation();
 
   const handleSubmit = async (
-    credentials: Credentials,
-    { setErrors }: FormikHelpers<Credentials>
+    { confirmPassword, ...credentials }: RegisterValues,
+    { setErrors }: FormikHelpers<RegisterValues>
   ) => {
     try {
-      await login(credentials);
-      onLoginSuccess && onLoginSuccess();
+      await register(credentials);
+      onRegisterSuccess && onRegisterSuccess();
     } catch (err: any) {
       setErrors({
         email: err.message,
@@ -72,16 +99,28 @@ export const LoginForm: React.FC<Props> = ({ onSubmit, onLoginSuccess }) => {
             disabled={loading}
             autoComplete="email"
           />
+          <FormInput
+            placeholder={t("name")}
+            name="name"
+            disabled={loading}
+            autoComplete="name"
+          />
           <FormPasswordInput
             placeholder={t("password")}
             name="password"
             disabled={loading}
             abilityToShow
-            autoComplete="password"
+            autoComplete="new-password"
+          />
+          <FormPasswordInput
+            placeholder={t("confirmPassword")}
+            name="confirmPassword"
+            disabled={loading}
+            autoComplete="new-password"
           />
           <FormError />
           <Button type="submit" isLoading={loading}>
-            {t("login")}
+            {t("register")}
           </Button>
         </Flex>
       </Form>

@@ -6,6 +6,7 @@ import {
 import { HomePage } from "./home-page";
 import { LoginPage } from "./login-page/LoginPage";
 import { useAuth } from "../shared/auth";
+import { RegisterPage } from "./register-page/RegisterPage";
 
 export const Routes: React.FC = () => {
   const { authenticated } = useAuth();
@@ -15,6 +16,10 @@ export const Routes: React.FC = () => {
     {
       path: "/login",
       element: authenticated ? <Navigate to="/" /> : <LoginPage />,
+    },
+    {
+      path: "/register",
+      element: authenticated ? <Navigate to="/" /> : <RegisterPage />,
     },
   ]);
   return <RouterProvider router={router} />;
