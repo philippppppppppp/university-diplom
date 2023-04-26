@@ -17,9 +17,10 @@ const maxPasswordLength = +(process.env.REACT_APP_MAX_PASSWORD_LENGTH ?? 20);
 
 interface Props {
   onSubmit?(): void;
+  onLoginSuccess?(): void;
 }
 
-export const LoginForm: React.FC<Props> = ({ onSubmit: onLogin }) => {
+export const LoginForm: React.FC<Props> = ({ onSubmit, onLoginSuccess }) => {
   const { login, loading } = useAuth();
   const { t } = useTranslation();
 
@@ -29,13 +30,14 @@ export const LoginForm: React.FC<Props> = ({ onSubmit: onLogin }) => {
   ) => {
     try {
       await login(credentials);
+      onLoginSuccess && onLoginSuccess();
     } catch (err: any) {
       setErrors({
         email: err.message,
         password: err.message,
       });
     } finally {
-      onLogin && onLogin();
+      onSubmit && onSubmit();
     }
   };
 

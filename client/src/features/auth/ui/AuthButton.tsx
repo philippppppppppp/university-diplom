@@ -11,7 +11,7 @@ import {
 import { useTranslation } from "../../../shared/translations";
 import { useAuth } from "../../../shared/auth";
 import { LoginForm } from "./LoginForm";
-import { Link } from "react-router-dom";
+import { RedirectLink } from "../../../shared/redirect";
 
 interface Props {
   withPopUp?: boolean;
@@ -48,7 +48,7 @@ export const AuthButton: FC<Props> = ({ withPopUp }) => {
   }
 
   return (
-    <Button as={Link} to="/login">
+    <Button as={RedirectLink} to="/login">
       {t("login")}
     </Button>
   );
