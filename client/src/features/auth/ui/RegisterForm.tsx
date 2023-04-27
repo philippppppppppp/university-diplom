@@ -68,16 +68,15 @@ export const RegisterForm: React.FC<Props> = ({
   const { t } = useTranslation();
 
   const handleSubmit = async (
-    { confirmPassword, ...credentials }: RegisterValues,
+    { confirmPassword, ...registerValues }: RegisterValues,
     { setErrors }: FormikHelpers<RegisterValues>
   ) => {
     try {
-      await register(credentials);
+      await register(registerValues);
       onRegisterSuccess && onRegisterSuccess();
     } catch (err: any) {
       setErrors({
         email: err.message,
-        password: err.message,
       });
     } finally {
       onSubmit && onSubmit();

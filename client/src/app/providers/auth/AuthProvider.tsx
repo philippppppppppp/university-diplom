@@ -50,7 +50,7 @@ const authClient: Client = {
   },
 };
 
-const messagesToForward = ["INVALID_CREDENTIALS"];
+const messagesToForward = ["INVALID_CREDENTIALS", "EMAIL_ALREADY_REGISTERED"];
 const messagesNotToHandle = ["INVALID_TOKEN"];
 
 export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {

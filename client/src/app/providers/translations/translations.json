@@ -18,7 +18,8 @@
     "nameLength": "Довжина імені від {{ min }} до {{ max }} символів",
     "loginRequiredFields": "Пошта та пароль обов'язкові поля",
     "registerRequiredFields": "Заповніть всі поля",
-    "INVALID_CREDENTIALS": "Невірний логін або пароль"
+    "INVALID_CREDENTIALS": "Невірний логін або пароль",
+    "EMAIL_ALREADY_REGISTERED": "Електронна пошта вже зареєстрована"
   },
   "ru": {
     "buy": "Купить",
@@ -39,6 +40,7 @@
     "nameLength": "Длина имени от {{ min }} до {{ max }} символов",
     "loginRequiredFields": "Почта и пароль обязательные поля",
     "registerRequiredFields": "Заполните все поля",
-    "INVALID_CREDENTIALS": "Неверный логин или пароль"
+    "INVALID_CREDENTIALS": "Неверный логин или пароль",
+    "EMAIL_ALREADY_REGISTERED": "Электронная почта уже зарегистрирована"
   }
 }
