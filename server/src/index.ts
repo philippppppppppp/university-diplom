@@ -3,7 +3,7 @@ import cookieParser from "cookie-parser";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import cors from "cors";
-import { getUserByEmail } from "./api";
+import { getUserByEmail, insertUser } from "./api";
 import * as RefreshTokens from "./refreshTokens";
 
 const port = process.env.PORT ?? 8000;
@@ -24,7 +24,41 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.post("/api/auth/register", async (req, res) => {
-  res.status(501).json({ status: "Error", message: "NOT_IMPLEMENTED" });
+  try {
+    const { email, name, password } = req.body;
+    if (
+      !email ||
+      typeof email !== "string" ||
+      !name ||
+      typeof name !== "string" ||
+      !password ||
+      typeof password !== "string"
+    ) {
+      return res.status(400).json({
+        status: "Error",
+        message: "INVALID_REGISTER_DATA",
+      });
+    }
+    const transformedEmail = email.toLowerCase();
+    const user = await getUserByEmail(transformedEmail);
+    if (user) {
+      return res.status(400).json({
+        status: "Error",
+        message: "EMAIL_ALREADY_REGISTERED",
+      });
+    }
+    const hashedPassword = bcrypt.hashSync(password, saltRounds);
+    await insertUser(transformedEmail, hashedPassword, name);
+    return res.status(200).json({
+      status: "OK",
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: "Error",
+      message: "SOMETHING_WENT_WRONG",
+      details: JSON.stringify(err),
+    });
+  }
 });
 
 app.post("/api/auth/login", async (req, res) => {
