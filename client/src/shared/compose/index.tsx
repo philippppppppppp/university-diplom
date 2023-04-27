@@ -1,7 +1,7 @@
-import { FC, PropsWithChildren } from "react";
+import { FC, PropsWithChildren, JSXElementConstructor } from "react";
 
 interface Props {
-  components: Array<React.JSXElementConstructor<React.PropsWithChildren<any>>>;
+  components: Array<JSXElementConstructor<PropsWithChildren<any>>>;
 }
 
 export const Compose: FC<PropsWithChildren<Props>> = (props) => {
