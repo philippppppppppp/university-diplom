@@ -8,10 +8,12 @@ import * as RefreshTokens from "./refreshTokens";
 
 const port = process.env.PORT ?? 8000;
 const jwtAccessSecret = process.env.JWT_ACCESS_SECRET ?? "myjwtsecretkey";
+const jtwAccessExpires = process.env.JWT_ACCESS_EXPIRES ?? "5m";
 const jwtRefreshSecret =
   process.env.JWT_REFRESH_SECRET ?? "myrefreshjwtsecretkey";
-const accountActivationTime = process.env.ACCOUNT_ACTIVATION_TIME ?? "30d";
-const accountActivationSecret =
+const jtwRefreshExpires = process.env.JWT_ACCESS_EXPIRES ?? "2w";
+const accountActivationTokenExpires = process.env.JWT_REFRESH_EXPIRES ?? "30d";
+const accountActivationTokenSecret =
   process.env.ACCOUNT_ACTIVATION_SECRET ?? "myaccountactivationsecretkey";
 
 const saltRounds = 10;
@@ -57,8 +59,8 @@ app.post("/api/auth/register", async (req, res) => {
     }
     const hashedPassword = bcrypt.hashSync(password, saltRounds);
     const { id } = await insertUser(transformedEmail, hashedPassword, name);
-    const activationToken = jwt.sign({ id }, accountActivationSecret, {
-      expiresIn: accountActivationTime,
+    const activationToken = jwt.sign({ id }, accountActivationTokenSecret, {
+      expiresIn: accountActivationTokenExpires,
     });
     await sendActivationToken(activationToken);
     return res.status(200).json({
@@ -107,7 +109,7 @@ app.post("/api/auth/login", async (req, res) => {
       });
     }
     const refreshToken = jwt.sign({ id: user.id }, jwtRefreshSecret, {
-      expiresIn: "2w",
+      expiresIn: jtwRefreshExpires,
     });
     RefreshTokens.add(refreshToken, user.id);
     return res
@@ -117,7 +119,9 @@ app.post("/api/auth/login", async (req, res) => {
       })
       .json({
         status: "OK",
-        token: jwt.sign({ id: user.id }, jwtAccessSecret, { expiresIn: "5m" }),
+        token: jwt.sign({ id: user.id }, jwtAccessSecret, {
+          expiresIn: jtwAccessExpires,
+        }),
       });
   } catch (err) {
     res.status(500).json({
@@ -147,7 +151,7 @@ app.post("/api/auth/refresh", (req, res) => {
     RefreshTokens.remove(refresh);
     const { userId } = entry;
     const refreshToken = jwt.sign({ id: userId }, jwtRefreshSecret, {
-      expiresIn: "2w",
+      expiresIn: jtwRefreshExpires,
     });
     RefreshTokens.add(refreshToken, userId);
     return res
@@ -157,7 +161,9 @@ app.post("/api/auth/refresh", (req, res) => {
       })
       .json({
         status: "OK",
-        token: jwt.sign({ id: userId }, jwtAccessSecret, { expiresIn: "5m" }),
+        token: jwt.sign({ id: userId }, jwtAccessSecret, {
+          expiresIn: jtwAccessExpires,
+        }),
       });
   } catch (err) {
     res.status(500).json({
