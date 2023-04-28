@@ -7,8 +7,12 @@ import { getUserByEmail, insertUser } from "./api";
 import * as RefreshTokens from "./refreshTokens";
 
 const port = process.env.PORT ?? 8000;
-const jwtAccessSecret = process.env.JWT_ACCESS_SECRET ?? "";
-const jwtRefreshSecret = process.env.JWT_REFRESH_SECRET ?? "";
+const jwtAccessSecret = process.env.JWT_ACCESS_SECRET ?? "myjwtsecretkey";
+const jwtRefreshSecret =
+  process.env.JWT_REFRESH_SECRET ?? "myrefreshjwtsecretkey";
+const accountActivationTime = process.env.ACCOUNT_ACTIVATION_TIME ?? "30d";
+const accountActivationSecret =
+  process.env.ACCOUNT_ACTIVATION_SECRET ?? "myaccountactivationsecretkey";
 
 const saltRounds = 10;
 
@@ -22,6 +26,10 @@ app.use(
 );
 app.use(express.json());
 app.use(cookieParser());
+
+const sendActivationToken = async (token: string) => {
+  console.log("Registration activation token", token);
+};
 
 app.post("/api/auth/register", async (req, res) => {
   try {
@@ -48,7 +56,11 @@ app.post("/api/auth/register", async (req, res) => {
       });
     }
     const hashedPassword = bcrypt.hashSync(password, saltRounds);
-    await insertUser(transformedEmail, hashedPassword, name);
+    const { id } = await insertUser(transformedEmail, hashedPassword, name);
+    const activationToken = jwt.sign({ id }, accountActivationSecret, {
+      expiresIn: accountActivationTime,
+    });
+    await sendActivationToken(activationToken);
     return res.status(200).json({
       status: "OK",
     });
@@ -80,6 +92,12 @@ app.post("/api/auth/login", async (req, res) => {
       return res.status(400).json({
         status: "Error",
         message: "INVALID_CREDENTIALS",
+      });
+    }
+    if (!user.activated) {
+      return res.status(400).json({
+        status: "Error",
+        message: "NOT_ACTIVATED",
       });
     }
     if (!bcrypt.compareSync(password, user.password)) {

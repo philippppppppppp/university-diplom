@@ -16,6 +16,7 @@ const getUserByEmailQuery = gql`
       email
       password
       name
+      activated
     }
   }
 `;
@@ -25,6 +26,7 @@ interface User {
   email: string;
   password: string;
   name: string;
+  activated: boolean;
 }
 
 export const getUserByEmail = async (email: string) => {
@@ -46,6 +48,7 @@ const insertUserQuery = gql`
       email
       password
       name
+      activated
     }
   }
 `;

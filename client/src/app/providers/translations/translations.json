@@ -19,7 +19,8 @@
     "loginRequiredFields": "Пошта та пароль обов'язкові поля",
     "registerRequiredFields": "Заповніть всі поля",
     "INVALID_CREDENTIALS": "Невірний логін або пароль",
-    "EMAIL_ALREADY_REGISTERED": "Електронна пошта вже зареєстрована"
+    "EMAIL_ALREADY_REGISTERED": "Електронна пошта вже зареєстрована",
+    "NOT_ACTIVATED": "Електронна пошта не підтверджена"
   },
   "ru": {
     "buy": "Купить",
@@ -41,6 +42,7 @@
     "loginRequiredFields": "Почта и пароль обязательные поля",
     "registerRequiredFields": "Заполните все поля",
     "INVALID_CREDENTIALS": "Неверный логин или пароль",
-    "EMAIL_ALREADY_REGISTERED": "Электронная почта уже зарегистрирована"
+    "EMAIL_ALREADY_REGISTERED": "Электронная почта уже зарегистрирована",
+    "NOT_ACTIVATED": "Электронная почта не подтверждена"
   }
 }
