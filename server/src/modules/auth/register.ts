@@ -42,7 +42,6 @@ export const registerHandler = async (req: Request, res: Response) => {
       status: "OK",
     });
   } catch (err) {
-    console.log(err);
     res.status(500).json({
       status: "Error",
       message: "SOMETHING_WENT_WRONG",
