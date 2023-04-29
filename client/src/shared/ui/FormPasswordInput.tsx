@@ -38,6 +38,7 @@ export const FormPasswordInput: FC<Props> = ({
             aria-label="Show/hide password"
             icon={showPassword ? <ViewOffIcon /> : <ViewIcon />}
             onClick={switchShowPassword}
+            tabIndex={-1}
           />
         </InputRightElement>
       </InputGroup>

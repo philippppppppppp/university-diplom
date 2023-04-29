@@ -8,12 +8,14 @@ import { MinimalLayout } from "../../shared/ui";
 export const ActivationPage: FC = () => {
   const { t } = useTranslation();
   const [error, setError] = useState<null | string>(null);
+  const [success, setSuccess] = useState(false);
   const { token } = useParams<{ token: "string" }>();
   const { activate, loading } = useAuth();
 
   const handleActivate = useCallback(async () => {
     try {
       await activate(token!);
+      setSuccess(true);
     } catch (err: any) {
       setError(err?.message);
     }
@@ -25,6 +27,7 @@ export const ActivationPage: FC = () => {
     <MinimalLayout>
       {loading && <Spinner />}
       {!!error && t(error)}
+      {success && t("activationSuccess")}
     </MinimalLayout>
   );
 };
