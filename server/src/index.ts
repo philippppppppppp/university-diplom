@@ -15,6 +15,8 @@ const jtwRefreshExpires = process.env.JWT_ACCESS_EXPIRES ?? "2w";
 const accountActivationTokenSecret =
   process.env.ACCOUNT_ACTIVATION_SECRET ?? "myaccountactivationsecretkey";
 const accountActivationTokenExpires = process.env.JWT_REFRESH_EXPIRES ?? "1h";
+const activationUrl =
+  process.env.ACTIVATION_URL ?? "http://localhost:3000/activate";
 
 const saltRounds = 10;
 
@@ -30,7 +32,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 const sendActivationToken = async (token: string) => {
-  console.log("Registration activation token", token);
+  console.log("Registration activation token", `${activationUrl}/${token}`);
 };
 
 app.post("/api/auth/register", async (req, res) => {
