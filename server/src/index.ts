@@ -3,7 +3,7 @@ import cookieParser from "cookie-parser";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import cors from "cors";
-import { getUserByEmail, insertUser } from "./api";
+import { activateUser, getUserByEmail, getUserById, insertUser } from "./api";
 import * as RefreshTokens from "./refreshTokens";
 
 const port = process.env.PORT ?? 8000;
@@ -12,9 +12,9 @@ const jtwAccessExpires = process.env.JWT_ACCESS_EXPIRES ?? "5m";
 const jwtRefreshSecret =
   process.env.JWT_REFRESH_SECRET ?? "myrefreshjwtsecretkey";
 const jtwRefreshExpires = process.env.JWT_ACCESS_EXPIRES ?? "2w";
-const accountActivationTokenExpires = process.env.JWT_REFRESH_EXPIRES ?? "30d";
 const accountActivationTokenSecret =
   process.env.ACCOUNT_ACTIVATION_SECRET ?? "myaccountactivationsecretkey";
+const accountActivationTokenExpires = process.env.JWT_REFRESH_EXPIRES ?? "1h";
 
 const saltRounds = 10;
 
@@ -63,6 +63,62 @@ app.post("/api/auth/register", async (req, res) => {
       expiresIn: accountActivationTokenExpires,
     });
     await sendActivationToken(activationToken);
+    return res.status(200).json({
+      status: "OK",
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: "Error",
+      message: "SOMETHING_WENT_WRONG",
+      details: JSON.stringify(err),
+    });
+  }
+});
+
+app.post("/api/auth/activate", async (req, res) => {
+  try {
+    const { activationToken } = req.body;
+    let payload;
+    try {
+      payload = jwt.verify(activationToken, accountActivationTokenSecret) as {
+        id?: string;
+      };
+    } catch (err: any) {
+      if (err.message === "jwt malformed") {
+        return res.status(400).json({
+          status: "Error",
+          message: "INVALID_ACTIVATION_TOKEN",
+        });
+      }
+      if (err.message === "jwt expired") {
+        return res.status(400).json({
+          status: "Error",
+          message: "ACTIVATION_TOKEN_EXPIRED",
+        });
+      }
+      throw err;
+    }
+    const { id } = payload;
+    if (!id || typeof id !== "string") {
+      return res.status(400).json({
+        status: "Error",
+        message: "INVALID_ACTIVATION_TOKEN",
+      });
+    }
+    const user = await getUserById(id);
+    if (!user) {
+      return res.status(400).json({
+        status: "Error",
+        message: "INVALID_ACTIVATION_TOKEN",
+      });
+    }
+    if (user.activated) {
+      return res.status(400).json({
+        status: "Error",
+        message: "USER_ALREADY_ACTIVATED",
+      });
+    }
+    await activateUser(id);
     return res.status(200).json({
       status: "OK",
     });

@@ -9,6 +9,58 @@ const client = new GraphQLClient(hasuraUrl, {
 
 //TODO: handle errors
 
+interface User {
+  id: string;
+  email: string;
+  password: string;
+  name: string;
+  activated: boolean;
+}
+
+const getUserByIdQuery = gql`
+  query getUserById($id: uuid!) {
+    users_by_pk(id: $id) {
+      activated
+      email
+      id
+      name
+      password
+    }
+  }
+`;
+
+export const getUserById = async (id: string) => {
+  const { users_by_pk } = await client.request<{ users_by_pk: User }>(
+    getUserByIdQuery,
+    {
+      id,
+    }
+  );
+  return users_by_pk;
+};
+
+const activateUserQuery = gql`
+  mutation activateUser($id: uuid!) {
+    update_users_by_pk(pk_columns: { id: $id }, _set: { activated: true }) {
+      activated
+      email
+      id
+      name
+      password
+    }
+  }
+`;
+
+export const activateUser = async (id: string) => {
+  const { users_by_pk } = await client.request<{ users_by_pk: User }>(
+    activateUserQuery,
+    {
+      id,
+    }
+  );
+  return users_by_pk;
+};
+
 const getUserByEmailQuery = gql`
   query getUserByEmail($email: String) {
     users(where: { email: { _eq: $email } }) {
@@ -20,14 +72,6 @@ const getUserByEmailQuery = gql`
     }
   }
 `;
-
-interface User {
-  id: string;
-  email: string;
-  password: string;
-  name: string;
-  activated: boolean;
-}
 
 export const getUserByEmail = async (email: string) => {
   const { users } = await client.request<{ users: User[] }>(
