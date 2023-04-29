@@ -3,22 +3,15 @@ import cookieParser from "cookie-parser";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import cors from "cors";
-import { activateUser, getUserByEmail, getUserById, insertUser } from "./api";
-import * as RefreshTokens from "./refreshTokens";
-
-const port = process.env.PORT ?? 8000;
-const jwtAccessSecret = process.env.JWT_ACCESS_SECRET ?? "myjwtsecretkey";
-const jtwAccessExpires = process.env.JWT_ACCESS_EXPIRES ?? "5m";
-const jwtRefreshSecret =
-  process.env.JWT_REFRESH_SECRET ?? "myrefreshjwtsecretkey";
-const jtwRefreshExpires = process.env.JWT_ACCESS_EXPIRES ?? "2w";
-const accountActivationTokenSecret =
-  process.env.ACCOUNT_ACTIVATION_SECRET ?? "myaccountactivationsecretkey";
-const accountActivationTokenExpires = process.env.JWT_REFRESH_EXPIRES ?? "1h";
-const activationUrl =
-  process.env.ACTIVATION_URL ?? "http://localhost:3000/activate";
-
-const saltRounds = 10;
+import {
+  activateUser,
+  getUserByEmail,
+  getUserById,
+  insertUser,
+} from "./services/users";
+import * as RefreshTokens from "./services/refreshTokens";
+import { sendActivationToken } from "./services/emailService";
+import { config } from "./config";
 
 const app = express();
 
@@ -30,10 +23,6 @@ app.use(
 );
 app.use(express.json());
 app.use(cookieParser());
-
-const sendActivationToken = async (token: string) => {
-  console.log("Registration activation token", `${activationUrl}/${token}`);
-};
 
 app.post("/api/auth/register", async (req, res) => {
   try {
@@ -59,10 +48,13 @@ app.post("/api/auth/register", async (req, res) => {
         message: "EMAIL_ALREADY_REGISTERED",
       });
     }
-    const hashedPassword = bcrypt.hashSync(password, saltRounds);
+    const hashedPassword = bcrypt.hashSync(
+      password,
+      config.passwordEncryptionRounds
+    );
     const { id } = await insertUser(transformedEmail, hashedPassword, name);
-    const activationToken = jwt.sign({ id }, accountActivationTokenSecret, {
-      expiresIn: accountActivationTokenExpires,
+    const activationToken = jwt.sign({ id }, config.accountActivationSecret, {
+      expiresIn: config.accountActivationExpires,
     });
     await sendActivationToken(activationToken);
     return res.status(200).json({
@@ -82,7 +74,7 @@ app.post("/api/auth/activate", async (req, res) => {
     const { activationToken } = req.body;
     let payload;
     try {
-      payload = jwt.verify(activationToken, accountActivationTokenSecret) as {
+      payload = jwt.verify(activationToken, config.accountActivationSecret) as {
         id?: string;
       };
     } catch (err: any) {
@@ -166,8 +158,8 @@ app.post("/api/auth/login", async (req, res) => {
         message: "INVALID_CREDENTIALS",
       });
     }
-    const refreshToken = jwt.sign({ id: user.id }, jwtRefreshSecret, {
-      expiresIn: jtwRefreshExpires,
+    const refreshToken = jwt.sign({ id: user.id }, config.jwtRefreshSecret, {
+      expiresIn: config.jtwRefreshExpires,
     });
     RefreshTokens.add(refreshToken, user.id);
     return res
@@ -177,8 +169,8 @@ app.post("/api/auth/login", async (req, res) => {
       })
       .json({
         status: "OK",
-        token: jwt.sign({ id: user.id }, jwtAccessSecret, {
-          expiresIn: jtwAccessExpires,
+        token: jwt.sign({ id: user.id }, config.jwtAccessSecret, {
+          expiresIn: config.jtwAccessExpires,
         }),
       });
   } catch (err) {
@@ -208,8 +200,8 @@ app.post("/api/auth/refresh", (req, res) => {
     }
     RefreshTokens.remove(refresh);
     const { userId } = entry;
-    const refreshToken = jwt.sign({ id: userId }, jwtRefreshSecret, {
-      expiresIn: jtwRefreshExpires,
+    const refreshToken = jwt.sign({ id: userId }, config.jwtRefreshSecret, {
+      expiresIn: config.jtwRefreshExpires,
     });
     RefreshTokens.add(refreshToken, userId);
     return res
@@ -219,8 +211,8 @@ app.post("/api/auth/refresh", (req, res) => {
       })
       .json({
         status: "OK",
-        token: jwt.sign({ id: userId }, jwtAccessSecret, {
-          expiresIn: jtwAccessExpires,
+        token: jwt.sign({ id: userId }, config.jwtAccessSecret, {
+          expiresIn: config.jtwAccessExpires,
         }),
       });
   } catch (err) {
@@ -254,6 +246,6 @@ app.post("/api/auth/logout", (req, res) => {
   }
 });
 
-app.listen(port, () => {
-  console.log("Server is listening port", port);
+app.listen(config.port, () => {
+  console.log("Server is listening port", config.port);
 });
