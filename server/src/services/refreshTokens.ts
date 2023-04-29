@@ -5,15 +5,15 @@ interface RefreshTokenEntry {
 
 const refreshTokens: RefreshTokenEntry[] = [];
 
-const add = (token: string, userId: string) => {
+const add = async (token: string, userId: string) => {
   refreshTokens.push({ token, userId });
 };
 
-const find = (token: string) => {
+const find = async (token: string) => {
   return refreshTokens.find((t) => t.token === token);
 };
 
-const remove = (token: string) => {
+const remove = async (token: string) => {
   refreshTokens.filter((t) => t.token !== token);
 };
 

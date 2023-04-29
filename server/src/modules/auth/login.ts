@@ -41,7 +41,7 @@ export const loginHandler = async (req: Request, res: Response) => {
     const refreshToken = jwt.sign({ id: user.id }, config.jwtRefreshSecret, {
       expiresIn: config.jtwRefreshExpires,
     });
-    RefreshTokens.add(refreshToken, user.id);
+    await RefreshTokens.add(refreshToken, user.id);
     return res
       .status(200)
       .cookie("refresh", refreshToken, {
