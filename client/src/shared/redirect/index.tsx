@@ -9,7 +9,7 @@ export const useRedirect = () => {
   const redirectTo = state?.[redirectKey] ?? "/";
 
   const redirect = () => {
-    navigate(redirectTo ?? "/");
+    navigate(redirectTo);
   };
 
   return redirect;

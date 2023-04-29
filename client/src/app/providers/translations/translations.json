@@ -20,7 +20,9 @@
     "registerRequiredFields": "Заповніть всі поля",
     "INVALID_CREDENTIALS": "Невірний логін або пароль",
     "EMAIL_ALREADY_REGISTERED": "Електронна пошта вже зареєстрована",
-    "NOT_ACTIVATED": "Електронна пошта не підтверджена"
+    "NOT_ACTIVATED": "Електронна пошта не підтверджена",
+    "USER_ALREADY_ACTIVATED": "Обліковий запис вже активовано",
+    "ACTIVATION_TOKEN_EXPIRED": "Строк активації минув. Увійдіть до облікового запису, щоб надіслати новий лист"
   },
   "ru": {
     "buy": "Купить",
@@ -43,6 +45,8 @@
     "registerRequiredFields": "Заполните все поля",
     "INVALID_CREDENTIALS": "Неверный логин или пароль",
     "EMAIL_ALREADY_REGISTERED": "Электронная почта уже зарегистрирована",
-    "NOT_ACTIVATED": "Электронная почта не подтверждена"
+    "NOT_ACTIVATED": "Электронная почта не подтверждена",
+    "USER_ALREADY_ACTIVATED": "Учетная запись уже активирована",
+    "ACTIVATION_TOKEN_EXPIRED": "Срок активации истек. Войдите в учетную запись чтобы отправить новое письмо"
   }
 }

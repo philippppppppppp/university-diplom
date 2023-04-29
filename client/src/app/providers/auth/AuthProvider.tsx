@@ -1,4 +1,4 @@
-import { FC, PropsWithChildren, useEffect } from "react";
+import { FC, PropsWithChildren, useEffect, useState } from "react";
 import {
   AuthProvider as AuthProviderLib,
   AuthToken,
@@ -6,11 +6,6 @@ import {
 } from "../../../shared/auth";
 import axios, { AxiosError } from "axios";
 import { useToast } from "@chakra-ui/react";
-
-const instance = axios.create({
-  baseURL: process.env.REACT_APP_API_URL,
-  withCredentials: true,
-});
 
 interface ResponseSchema {
   status: "OK";
@@ -28,39 +23,25 @@ interface TokenResponse {
   token: AuthToken;
 }
 
-const authClient: Client = {
-  async register(registerData) {
-    await instance.post<ResponseData>("/register", registerData);
-  },
-  async login(credentials) {
-    const { data } = await instance.post<ResponseData<TokenResponse>>(
-      "/login",
-      credentials
-    );
-    return data.token;
-  },
-  async refresh() {
-    const { data } = await instance.post<ResponseData<TokenResponse>>(
-      "/refresh"
-    );
-    return data.token;
-  },
-  async logout() {
-    await instance.post<ResponseData>("/logout");
-  },
-};
-
 const messagesToForward = [
   "INVALID_CREDENTIALS",
   "NOT_ACTIVATED",
   "EMAIL_ALREADY_REGISTERED",
+  "ACTIVATION_TOKEN_EXPIRED",
+  "USER_ALREADY_ACTIVATED",
 ];
 const messagesNotToHandle = ["INVALID_TOKEN"];
 
 export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
   const toast = useToast();
+  const [client, setClient] = useState<null | Client>(null);
 
   useEffect(() => {
+    const instance = axios.create({
+      baseURL: process.env.REACT_APP_API_URL,
+      withCredentials: true,
+    });
+
     const interceptor = instance.interceptors.response.use(
       (res) => res,
       ({ response }: AxiosError<ErrorSchema>) => {
@@ -75,8 +56,39 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
         });
       }
     );
-    return () => instance.interceptors.response.eject(interceptor);
+
+    const client: Client = {
+      async register(registerData) {
+        await instance.post<ResponseData>("/register", registerData);
+      },
+      async activate(activationToken) {
+        await instance.post<ResponseData>("/activate", { activationToken });
+      },
+      async login(credentials) {
+        const { data } = await instance.post<ResponseData<TokenResponse>>(
+          "/login",
+          credentials
+        );
+        return data.token;
+      },
+      async refresh() {
+        const { data } = await instance.post<ResponseData<TokenResponse>>(
+          "/refresh"
+        );
+        return data.token;
+      },
+      async logout() {
+        await instance.post<ResponseData>("/logout");
+      },
+    };
+
+    setClient(client);
+
+    return () => {
+      instance.interceptors.response.eject(interceptor);
+      setClient(null);
+    };
   }, [toast]);
 
-  return <AuthProviderLib client={authClient}>{children}</AuthProviderLib>;
+  return <AuthProviderLib client={client}>{children}</AuthProviderLib>;
 };
