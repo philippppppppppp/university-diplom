@@ -12,6 +12,8 @@ export const config = rc("SERVER", {
     process.env.ACCOUNT_ACTIVATION_SECRET ?? "myaccountactivationsecretkey",
   accountActivationExpires:
     process.env.ACCOUNT_ACTIVATION_TOKEN_EXPIRES ?? "1h",
-  passwordEncryptionRounds: process.env.PASSWORD_ENCRYPTION_ROUNDS ?? 10,
+  passwordEncryptionRounds: process.env.PASSWORD_ENCRYPTION_ROUNDS
+    ? +process.env.PASSWORD_ENCRYPTION_ROUNDS
+    : 10,
   activationUrl: process.env.ACTIVATION_URL ?? "http://localhost:3000/activate",
 });
