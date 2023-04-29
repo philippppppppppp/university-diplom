@@ -12,19 +12,16 @@ export const activationHandler = async (req: Request, res: Response) => {
         id?: string;
       };
     } catch (err: any) {
-      if (err.message === "jwt malformed") {
-        return res.status(400).json({
-          status: "Error",
-          message: "INVALID_ACTIVATION_TOKEN",
-        });
-      }
       if (err.message === "jwt expired") {
         return res.status(400).json({
           status: "Error",
           message: "ACTIVATION_TOKEN_EXPIRED",
         });
       }
-      throw err;
+      return res.status(400).json({
+        status: "Error",
+        message: "INVALID_ACTIVATION_TOKEN",
+      });
     }
     const { id } = payload;
     if (!id || typeof id !== "string") {
