@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import jwt from "jsonwebtoken";
 import { config } from "../../config";
 import * as RefreshTokens from "../../services/refreshTokens";
+import { getAccessToken, getRefreshToken } from "../../services/tokens";
 
 export const refreshHandler = async (req: Request, res: Response) => {
   try {
@@ -21,9 +21,7 @@ export const refreshHandler = async (req: Request, res: Response) => {
     }
     await RefreshTokens.remove(refresh);
     const { userId } = entry;
-    const refreshToken = jwt.sign({ id: userId }, config.jwtRefreshSecret, {
-      expiresIn: config.jtwRefreshExpires,
-    });
+    const refreshToken = getRefreshToken(userId);
     await RefreshTokens.add(refreshToken, userId);
     return res
       .status(200)
@@ -32,9 +30,7 @@ export const refreshHandler = async (req: Request, res: Response) => {
       })
       .json({
         status: "OK",
-        token: jwt.sign({ id: userId }, config.jwtAccessSecret, {
-          expiresIn: config.jtwAccessExpires,
-        }),
+        token: getAccessToken(userId),
       });
   } catch (err) {
     res.status(500).json({

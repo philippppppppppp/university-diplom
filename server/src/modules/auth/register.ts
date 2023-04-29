@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
 import { config } from "../../config";
 import { getUserByEmail, insertUser } from "../../services/users";
 import { sendActivationToken } from "../../services/emailService";
+import { getActivationToken } from "../../services/tokens";
 
 export const registerHandler = async (req: Request, res: Response) => {
   try {
@@ -34,9 +34,7 @@ export const registerHandler = async (req: Request, res: Response) => {
       config.passwordEncryptionRounds
     );
     const { id } = await insertUser(transformedEmail, hashedPassword, name);
-    const activationToken = jwt.sign({ id }, config.accountActivationSecret, {
-      expiresIn: config.accountActivationExpires,
-    });
+    const activationToken = getActivationToken(id);
     await sendActivationToken(activationToken);
     return res.status(200).json({
       status: "OK",

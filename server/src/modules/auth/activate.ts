@@ -1,18 +1,29 @@
 import { Request, Response } from "express";
-import jwt from "jsonwebtoken";
-import { config } from "../../config";
 import { getUserById, activateUser } from "../../services/users";
+import { sendActivationToken } from "../../services/emailService";
+import {
+  decodeToken,
+  getActivationToken,
+  verifyActivationToken,
+} from "../../services/tokens";
 
 export const activationHandler = async (req: Request, res: Response) => {
   try {
     const { activationToken } = req.body;
     let payload;
     try {
-      payload = jwt.verify(activationToken, config.accountActivationSecret) as {
-        id?: string;
-      };
+      payload = verifyActivationToken(activationToken);
     } catch (err: any) {
       if (err.message === "jwt expired") {
+        const { id } = decodeToken(activationToken);
+        if (!id) {
+          return res.status(400).json({
+            status: "Error",
+            message: "INVALID_ACTIVATION_TOKEN",
+          });
+        }
+        const newToken = getActivationToken(id);
+        await sendActivationToken(newToken);
         return res.status(400).json({
           status: "Error",
           message: "ACTIVATION_TOKEN_EXPIRED",

@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
 import { config } from "../../config";
 import { getUserByEmail } from "../../services/users";
 import * as RefreshTokens from "../../services/refreshTokens";
+import { getAccessToken, getRefreshToken } from "../../services/tokens";
 
 export const loginHandler = async (req: Request, res: Response) => {
   try {
@@ -38,9 +38,7 @@ export const loginHandler = async (req: Request, res: Response) => {
         message: "INVALID_CREDENTIALS",
       });
     }
-    const refreshToken = jwt.sign({ id: user.id }, config.jwtRefreshSecret, {
-      expiresIn: config.jtwRefreshExpires,
-    });
+    const refreshToken = getRefreshToken(user.id);
     await RefreshTokens.add(refreshToken, user.id);
     return res
       .status(200)
@@ -49,9 +47,7 @@ export const loginHandler = async (req: Request, res: Response) => {
       })
       .json({
         status: "OK",
-        token: jwt.sign({ id: user.id }, config.jwtAccessSecret, {
-          expiresIn: config.jtwAccessExpires,
-        }),
+        token: getAccessToken(user.id),
       });
   } catch (err) {
     res.status(500).json({
