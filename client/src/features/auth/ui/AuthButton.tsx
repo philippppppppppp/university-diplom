@@ -9,11 +9,17 @@ import {
   PopoverHeader,
   PopoverTrigger,
   Text,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  Divider,
 } from "@chakra-ui/react";
 import { useTranslation } from "../../../shared/translations";
 import { useAuth } from "../../../shared/auth";
 import { LoginForm } from "./LoginForm";
 import { RedirectLink } from "../../../shared/redirect";
+import { Link } from "react-router-dom";
 
 interface Props {
   withPopUp?: boolean;
@@ -27,7 +33,21 @@ export const AuthButton: FC<Props> = ({ withPopUp }) => {
   const restoreFocus = () => ref.current?.focus();
 
   if (authenticated) {
-    return <Button onClick={logout}>{t("logout")}</Button>;
+    return (
+      <Menu>
+        <MenuButton as={Button}>~~name~~</MenuButton>
+        <MenuList>
+          <MenuItem as={Link} to="/my-ads">
+            {t("myAds")}
+          </MenuItem>
+          <MenuItem as={Link} to="/settings">
+            {t("settings")}
+          </MenuItem>
+          <Divider />
+          <MenuItem onClick={logout}>{t("logout")}</MenuItem>
+        </MenuList>
+      </Menu>
+    );
   }
 
   if (withPopUp) {
