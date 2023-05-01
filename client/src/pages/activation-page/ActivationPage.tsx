@@ -1,6 +1,6 @@
-import { FC, useCallback, useState } from "react";
+import { FC, useCallback, useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { useAuth, useOnAuthReady } from "../../shared/auth";
+import { useAuth } from "../../shared/auth";
 import { Spinner } from "@chakra-ui/react";
 import { useTranslation } from "../../shared/translations";
 import { MinimalLayout } from "../../shared/ui";
@@ -21,7 +21,9 @@ export const ActivationPage: FC = () => {
     }
   }, [activate, token]);
 
-  useOnAuthReady(handleActivate);
+  useEffect(() => {
+    handleActivate();
+  }, [handleActivate]);
 
   return (
     <MinimalLayout>

@@ -91,5 +91,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
     };
   }, [toast]);
 
+  if (!client) return null;
+
   return <AuthProviderLib client={client}>{children}</AuthProviderLib>;
 };
