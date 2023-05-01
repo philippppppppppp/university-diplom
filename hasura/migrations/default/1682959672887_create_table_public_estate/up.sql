@@ -1,0 +1,1 @@
+CREATE TABLE "public"."estate" ("id" uuid NOT NULL, "author" uuid NOT NULL, "title" text NOT NULL, "description" text, PRIMARY KEY ("id") , FOREIGN KEY ("author") REFERENCES "public"."users"("id") ON UPDATE restrict ON DELETE restrict, UNIQUE ("id"));
