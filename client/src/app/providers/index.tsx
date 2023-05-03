@@ -8,10 +8,10 @@ import { AuthProvider } from "./auth";
 export const ComposedProviders: FC<PropsWithChildren> = ({ children }) => (
   <Compose
     components={[
+      AuthProvider,
       ApiProvider,
       TranslationsProvider,
       StylesProvider,
-      AuthProvider,
     ]}
   >
     {children}

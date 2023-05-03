@@ -1,4 +1,4 @@
-import { FC, PropsWithChildren, useEffect, useState } from "react";
+import { FC, PropsWithChildren, useRef, useMemo } from "react";
 import {
   AuthProvider as AuthProviderLib,
   AuthToken,
@@ -35,63 +35,59 @@ const messagesNotToHandle = ["INVALID_TOKEN"];
 
 export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
   const toast = useToast();
-  const [client, setClient] = useState<null | Client>(null);
-
-  useEffect(() => {
-    const instance = axios.create({
-      baseURL: process.env.REACT_APP_API_URL,
+  const instanceRef = useRef(
+    axios.create({
+      baseURL: process.env.REACT_APP_AUTH_URL,
       withCredentials: true,
-    });
+    })
+  );
+  const interceptorRef = useRef<null | number>(null);
 
-    const interceptor = instance.interceptors.response.use(
-      (res) => res,
-      ({ response }: AxiosError<ErrorSchema>) => {
-        const error = response!.data;
-
-        if (messagesToForward.includes(error.message)) throw error;
-        if (messagesNotToHandle.includes(error.message)) return;
-        toast({
-          title: error.message,
-          description: error.details,
-          status: "error",
-        });
-      }
-    );
-
-    const client: Client = {
+  const client: Client = useMemo(() => {
+    return {
       async register(registerData) {
-        await instance.post<ResponseData>("/register", registerData);
+        await instanceRef.current.post<ResponseData>("/register", registerData);
       },
       async activate(activationToken) {
-        await instance.post<ResponseData>("/activate", { activationToken });
+        await instanceRef.current.post<ResponseData>("/activate", {
+          activationToken,
+        });
       },
       async login(credentials) {
-        const { data } = await instance.post<ResponseData<TokenResponse>>(
-          "/login",
-          credentials
-        );
+        const { data } = await instanceRef.current.post<
+          ResponseData<TokenResponse>
+        >("/login", credentials);
         return data.token;
       },
       async refresh() {
-        const { data } = await instance.post<ResponseData<TokenResponse>>(
-          "/refresh"
-        );
+        const { data } = await instanceRef.current.post<
+          ResponseData<TokenResponse>
+        >("/refresh");
         return data.token;
       },
       async logout() {
-        await instance.post<ResponseData>("/logout");
+        await instanceRef.current.post<ResponseData>("/logout");
       },
     };
+  }, []);
 
-    setClient(client);
+  if (interceptorRef.current !== null) {
+    instanceRef.current.interceptors.response.eject(interceptorRef.current);
+  }
 
-    return () => {
-      instance.interceptors.response.eject(interceptor);
-      setClient(null);
-    };
-  }, [toast]);
-
-  if (!client) return null;
+  interceptorRef.current = instanceRef.current.interceptors.response.use(
+    (res) => res,
+    ({ response }: AxiosError<ErrorSchema>) => {
+      const error = response!.data;
+      if (messagesToForward.includes(error.message)) throw error;
+      if (messagesNotToHandle.includes(error.message)) return;
+      toast({
+        title: error.message,
+        description: error.details,
+        status: "error",
+      });
+    }
+  );
 
   return <AuthProviderLib client={client}>{children}</AuthProviderLib>;
 };

@@ -6,7 +6,7 @@ interface Payload {
 }
 
 export const getAccessToken = (id: string) =>
-  jwt.sign({ id }, config.jwtAccessSecret, {
+  jwt.sign({ id, "x-hasura-role": "user" }, config.jwtAccessSecret, {
     expiresIn: config.jtwAccessExpires,
   });
 

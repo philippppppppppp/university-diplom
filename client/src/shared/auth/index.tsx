@@ -6,7 +6,9 @@ import {
   useState,
   useCallback,
   useEffect,
+  useRef,
 } from "react";
+import { getIdFromJwt } from "../getIdFromJwt";
 
 export type AuthToken = string | null;
 
@@ -21,9 +23,8 @@ export type RegisterData = Credentials & { name: string };
 
 interface Auth {
   authToken: AuthToken;
-  setAuthToken(authToken: AuthToken): void;
   authenticated: boolean;
-  loggedOut: boolean;
+  userId?: null | string;
   register(registerData: RegisterData): Promise<void>;
   activate(activationToken: ActivationToken): Promise<void>;
   login(credentials: Credentials): Promise<void>;
@@ -51,9 +52,10 @@ export const AuthProvider: FC<PropsWithChildren<Props>> = ({
   client,
 }) => {
   const [authToken, setAuthToken] = useState<AuthToken>(null);
-  const [loggedOut, setLoggedOut] = useState(false);
   const [loading, setLoading] = useState(false);
+  const refreshRequestRef = useRef<null | Promise<void>>(null);
   const authenticated = !!authToken;
+  const userId = authenticated ? getIdFromJwt(authToken) : null;
 
   const register = useCallback(
     async (registerData: RegisterData) => {
@@ -91,7 +93,6 @@ export const AuthProvider: FC<PropsWithChildren<Props>> = ({
       } catch (err) {
         throw err;
       } finally {
-        setLoggedOut(false);
         setLoading(false);
       }
     },
@@ -115,22 +116,27 @@ export const AuthProvider: FC<PropsWithChildren<Props>> = ({
       setAuthToken(null);
     } catch (err) {
     } finally {
-      setLoggedOut(true);
       setLoading(false);
     }
   }, [client]);
 
-  useEffect(() => {
-    refresh();
+  const refreshOnMount = useCallback(async () => {
+    if (!refreshRequestRef.current) {
+      refreshRequestRef.current = refresh();
+    }
+    await refreshRequestRef.current;
   }, [refresh]);
+
+  useEffect(() => {
+    refreshOnMount();
+  }, [refreshOnMount]);
 
   return (
     <context.Provider
       value={{
         authToken,
-        setAuthToken,
         authenticated,
-        loggedOut,
+        userId,
         register,
         activate,
         login,

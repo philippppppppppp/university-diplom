@@ -20,14 +20,16 @@ import { useAuth } from "../../../shared/auth";
 import { LoginForm } from "./LoginForm";
 import { RedirectLink } from "../../../shared/redirect";
 import { Link } from "react-router-dom";
+import { useUser } from "../../../entities/auth";
 
 interface Props {
   withPopUp?: boolean;
 }
 
 export const AuthButton: FC<Props> = ({ withPopUp }) => {
-  const { authenticated, logout } = useAuth();
+  const { authenticated, userId, logout } = useAuth();
   const { t } = useTranslation();
+  const { data: user } = useUser(userId);
 
   const ref = useRef<HTMLFormElement>(null);
   const restoreFocus = () => ref.current?.focus();
@@ -35,7 +37,7 @@ export const AuthButton: FC<Props> = ({ withPopUp }) => {
   if (authenticated) {
     return (
       <Menu>
-        <MenuButton as={Button}>~~name~~</MenuButton>
+        <MenuButton as={Button}>{user?.name}</MenuButton>
         <MenuList>
           <MenuItem as={Link} to="/my-ads">
             {t("myAds")}
