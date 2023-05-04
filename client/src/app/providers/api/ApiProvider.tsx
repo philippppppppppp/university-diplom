@@ -11,14 +11,17 @@ import {
 
 const queryClient = new QueryClient();
 
+//TODO: Fix it XD
 export const ApiProvider: FC<PropsWithChildren> = ({ children }) => {
-  const { authToken } = useAuth();
+  const { authToken, refresh } = useAuth();
   const instanceRef = useRef(
     axios.create({
       baseURL: process.env.REACT_APP_API_URL,
     })
   );
-  const interceptorRef = useRef<null | number>(null);
+  const requestInterceptorRef = useRef<null | number>(null);
+  const responseInterceptorRef = useRef<null | number>(null);
+  const refreshRequest = useRef<null | ReturnType<typeof refresh>>(null);
 
   const apiClient: Client = useMemo(() => {
     return {
@@ -32,16 +35,52 @@ export const ApiProvider: FC<PropsWithChildren> = ({ children }) => {
     };
   }, []);
 
-  if (interceptorRef.current !== null) {
-    instanceRef.current.interceptors.request.eject(interceptorRef.current);
+  if (requestInterceptorRef.current !== null) {
+    instanceRef.current.interceptors.request.eject(
+      requestInterceptorRef.current
+    );
   }
 
-  interceptorRef.current = instanceRef.current.interceptors.request.use(
+  requestInterceptorRef.current = instanceRef.current.interceptors.request.use(
     (config) => {
-      config.headers.Authorization = `Bearer ${authToken}`;
+      //@ts-ignore
+      if (!config.retry) {
+        config.headers.Authorization = `Bearer ${authToken}`;
+      }
       return config;
     }
   );
+
+  if (responseInterceptorRef.current !== null) {
+    instanceRef.current.interceptors.response.eject(
+      responseInterceptorRef.current
+    );
+  }
+
+  responseInterceptorRef.current =
+    instanceRef.current.interceptors.response.use(
+      async (res) => {
+        const code = res.data.errors?.[0].extensions.code;
+        if (res.data !== undefined) {
+          return res.data;
+        }
+        //@ts-ignore
+        if (code !== "invalid-jwt" || res.config.retry) {
+          throw res;
+        }
+        if (!refreshRequest.current) {
+          refreshRequest.current = refresh();
+        }
+        const token = await refreshRequest.current;
+        //@ts-ignore
+        return instanceRef.current({
+          ...res.config,
+          retry: true,
+          headers: { ...res.headers, Authorization: `Bearer ${token}` },
+        });
+      },
+      (err) => err
+    );
 
   return (
     <QueryClientProvider client={queryClient}>

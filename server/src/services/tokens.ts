@@ -6,9 +6,21 @@ interface Payload {
 }
 
 export const getAccessToken = (id: string) =>
-  jwt.sign({ id, "x-hasura-role": "user" }, config.jwtAccessSecret, {
-    expiresIn: config.jtwAccessExpires,
-  });
+  jwt.sign(
+    {
+      id,
+      "https://hasura.io/jwt/claims": {
+        "x-hasura-role": "user",
+        "x-hasura-user-id": id,
+        "x-hasura-default-role": "user",
+        "x-hasura-allowed-roles": ["user"],
+      },
+    },
+    config.jwtAccessSecret,
+    {
+      expiresIn: config.jtwAccessExpires,
+    }
+  );
 
 export const getRefreshToken = (id: string) =>
   jwt.sign({ id }, config.jwtRefreshSecret, {

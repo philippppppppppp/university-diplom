@@ -28,7 +28,7 @@ interface Auth {
   register(registerData: RegisterData): Promise<void>;
   activate(activationToken: ActivationToken): Promise<void>;
   login(credentials: Credentials): Promise<void>;
-  refresh(): Promise<void>;
+  refresh(): Promise<AuthToken>;
   logout(): Promise<void>;
   loading: boolean;
 }
@@ -53,7 +53,7 @@ export const AuthProvider: FC<PropsWithChildren<Props>> = ({
 }) => {
   const [authToken, setAuthToken] = useState<AuthToken>(null);
   const [loading, setLoading] = useState(false);
-  const refreshRequestRef = useRef<null | Promise<void>>(null);
+  const refreshRequestRef = useRef<null | ReturnType<Auth["refresh"]>>(null);
   const authenticated = !!authToken;
   const userId = authenticated ? getIdFromJwt(authToken) : null;
 
@@ -102,8 +102,11 @@ export const AuthProvider: FC<PropsWithChildren<Props>> = ({
   const refresh = useCallback(async () => {
     try {
       setLoading(true);
-      setAuthToken(await client.refresh());
+      const token = await client.refresh();
+      setAuthToken(token);
+      return token;
     } catch (err) {
+      throw err;
     } finally {
       setLoading(false);
     }

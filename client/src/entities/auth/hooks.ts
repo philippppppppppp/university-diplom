@@ -23,8 +23,8 @@ export const useUser = (id?: string | null) => {
   return useQuery(
     ["user"],
     async () => {
-      const { data } = await request<ByPkResponse<User>>(query, { id });
-      return data.users_by_pk;
+      const { users_by_pk } = await request<ByPkResponse<User>>(query, { id });
+      return users_by_pk;
     },
     {
       enabled: authenticated,
