@@ -12,18 +12,20 @@ const query = gql`
   }
 `;
 
-interface User {
+interface Viewer {
   id: string;
   name: string;
 }
 
-export const useUser = (id?: string | null) => {
+export const useViewer = () => {
   const { request } = useApi();
-  const { authenticated } = useAuth();
+  const { authenticated, userId } = useAuth();
   return useQuery(
     ["user"],
     async () => {
-      const { users_by_pk } = await request<ByPkResponse<User>>(query, { id });
+      const { users_by_pk } = await request<ByPkResponse<Viewer>>(query, {
+        id: userId,
+      });
       return users_by_pk;
     },
     {
