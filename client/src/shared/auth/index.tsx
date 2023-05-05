@@ -10,9 +10,9 @@ import {
 } from "react";
 import { getIdFromJwt } from "../getIdFromJwt";
 
-export type AuthToken = string | null;
+export type AuthToken = string;
 
-export type ActivationToken = string | null;
+export type ActivationToken = string;
 
 export interface Credentials {
   email: string;
@@ -22,13 +22,12 @@ export interface Credentials {
 export type RegisterData = Credentials & { name: string };
 
 interface Auth {
-  authToken: AuthToken;
+  userId: null | string;
   authenticated: boolean;
-  userId?: null | string;
   register(registerData: RegisterData): Promise<void>;
   activate(activationToken: ActivationToken): Promise<void>;
   login(credentials: Credentials): Promise<void>;
-  refresh(): Promise<AuthToken>;
+  refresh(): Promise<void>;
   logout(): Promise<void>;
   loading: boolean;
 }
@@ -47,15 +46,34 @@ interface Props {
   client: Client;
 }
 
+interface TokenService {
+  token: AuthToken | null;
+  get(): AuthToken | null;
+  set(token: AuthToken | null): void;
+  clear(): void;
+}
+
+export const tokenService: TokenService = {
+  token: null,
+  get() {
+    return this.token;
+  },
+  set(token) {
+    this.token = token;
+  },
+  clear() {
+    this.token = null;
+  },
+};
+
 export const AuthProvider: FC<PropsWithChildren<Props>> = ({
   children,
   client,
 }) => {
-  const [authToken, setAuthToken] = useState<AuthToken>(null);
+  const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const refreshRequestRef = useRef<null | ReturnType<Auth["refresh"]>>(null);
-  const authenticated = !!authToken;
-  const userId = authenticated ? getIdFromJwt(authToken) : null;
+  const authenticated = !!userId;
 
   const register = useCallback(
     async (registerData: RegisterData) => {
@@ -89,7 +107,9 @@ export const AuthProvider: FC<PropsWithChildren<Props>> = ({
     async (credentials: Credentials) => {
       try {
         setLoading(true);
-        setAuthToken(await client.login(credentials));
+        const token = await client.login(credentials);
+        tokenService.set(token);
+        setUserId(getIdFromJwt(token));
       } catch (err) {
         throw err;
       } finally {
@@ -103,8 +123,8 @@ export const AuthProvider: FC<PropsWithChildren<Props>> = ({
     try {
       setLoading(true);
       const token = await client.refresh();
-      setAuthToken(token);
-      return token;
+      tokenService.set(token);
+      setUserId(getIdFromJwt(token));
     } catch (err) {
       throw err;
     } finally {
@@ -116,7 +136,8 @@ export const AuthProvider: FC<PropsWithChildren<Props>> = ({
     try {
       setLoading(true);
       await client.logout();
-      setAuthToken(null);
+      tokenService.clear();
+      setUserId(null);
     } catch (err) {
     } finally {
       setLoading(false);
@@ -137,9 +158,8 @@ export const AuthProvider: FC<PropsWithChildren<Props>> = ({
   return (
     <context.Provider
       value={{
-        authToken,
-        authenticated,
         userId,
+        authenticated,
         register,
         activate,
         login,

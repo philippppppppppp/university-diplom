@@ -1,7 +1,7 @@
 import { PropsWithChildren, FC, useRef, useMemo } from "react";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
-import axios from "axios";
-import { useAuth } from "../../../shared/auth";
+import axios, { AxiosRequestConfig } from "axios";
+import { tokenService, useAuth } from "../../../shared/auth";
 import {
   ApiProvider as ApiProviderLib,
   Client,
@@ -11,9 +11,10 @@ import {
 
 const queryClient = new QueryClient();
 
-//TODO: Fix it XD
+const refreshRetry = new Set<AxiosRequestConfig>();
+
 export const ApiProvider: FC<PropsWithChildren> = ({ children }) => {
-  const { authToken, refresh } = useAuth();
+  const { refresh } = useAuth();
   const instanceRef = useRef(
     axios.create({
       baseURL: process.env.REACT_APP_API_URL,
@@ -21,7 +22,7 @@ export const ApiProvider: FC<PropsWithChildren> = ({ children }) => {
   );
   const requestInterceptorRef = useRef<null | number>(null);
   const responseInterceptorRef = useRef<null | number>(null);
-  const refreshRequest = useRef<null | ReturnType<typeof refresh>>(null);
+  const refreshRequest = useRef<null | Promise<void>>(null);
 
   const apiClient: Client = useMemo(() => {
     return {
@@ -43,10 +44,7 @@ export const ApiProvider: FC<PropsWithChildren> = ({ children }) => {
 
   requestInterceptorRef.current = instanceRef.current.interceptors.request.use(
     (config) => {
-      //@ts-ignore
-      if (!config.retry) {
-        config.headers.Authorization = `Bearer ${authToken}`;
-      }
+      config.headers.Authorization = `Bearer ${tokenService.get()}`;
       return config;
     }
   );
@@ -61,23 +59,20 @@ export const ApiProvider: FC<PropsWithChildren> = ({ children }) => {
     instanceRef.current.interceptors.response.use(
       async (res) => {
         const code = res.data.errors?.[0].extensions.code;
-        if (res.data !== undefined) {
+        if (res.data.data !== undefined) {
           return res.data;
         }
-        //@ts-ignore
-        if (code !== "invalid-jwt" || res.config.retry) {
+        if (code !== "invalid-jwt" || refreshRetry.has(res.config)) {
+          refreshRetry.delete(res.config);
           throw res;
         }
         if (!refreshRequest.current) {
           refreshRequest.current = refresh();
         }
-        const token = await refreshRequest.current;
-        //@ts-ignore
-        return instanceRef.current({
-          ...res.config,
-          retry: true,
-          headers: { ...res.headers, Authorization: `Bearer ${token}` },
-        });
+        await refreshRequest.current;
+        refreshRequest.current = null;
+        refreshRetry.add(res.config);
+        return instanceRef.current(res.config);
       },
       (err) => err
     );
