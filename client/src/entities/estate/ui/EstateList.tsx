@@ -18,8 +18,8 @@ import {
   PopoverBody,
   PopoverArrow,
 } from "@chakra-ui/react";
-import { useEstateList, EstateItem, EstateType, EstateRooms } from "../hooks";
-import { Link } from "react-router-dom";
+import { useEstateList, EstateItem } from "../hooks";
+import { Link, useSearchParams } from "react-router-dom";
 import { useTranslation } from "../../../shared/translations";
 import { Formik, Form } from "formik";
 import { FormInput } from "../../../shared/ui";
@@ -72,19 +72,20 @@ const Card: FC<CardProps> = ({
   );
 };
 
-const priceInitial = {
-  from: "",
-  to: "",
-};
-
 export const EstateList: FC = () => {
   const { t } = useTranslation();
-  const [type, setType] = useState<EstateType | null>(null);
-  const [rooms, setRooms] = useState<EstateRooms | null>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [type, setType] = useState<string>(searchParams.get("type") ?? "");
+  const [rooms, setRooms] = useState<string>(searchParams.get("rooms") ?? "");
+  const priceInitial = {
+    from: searchParams.get("priceFrom") ?? "",
+    to: searchParams.get("priceTo") ?? "",
+  };
   const [price, setPrice] = useState<{
-    from: null | number;
-    to: null | number;
-  }>({ from: null, to: null });
+    from: string;
+    to: string;
+  }>(priceInitial);
+
   const { data, isLoading, isSuccess } = useEstateList({
     type,
     rooms,
@@ -95,34 +96,78 @@ export const EstateList: FC = () => {
   const handleTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
     if (!value) {
-      setType(null);
+      setType("");
+      setSearchParams((prev) => {
+        const next = new URLSearchParams(prev);
+        next.delete("type");
+        return next;
+      });
       return;
     }
-    setType(value as EstateType);
+    setType(value);
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.set("type", value);
+      return next;
+    });
   };
 
   const handleRoomsChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
     if (!value) {
-      setRooms(null);
+      setRooms("");
+      setSearchParams((prev) => {
+        const next = new URLSearchParams(prev);
+        next.delete("rooms");
+        return next;
+      });
       return;
     }
-    const numberOfRooms = +value;
-    setRooms(numberOfRooms as EstateRooms);
+    setRooms(value);
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.set("rooms", value);
+      return next;
+    });
   };
 
-  const handlePriceSubmit = ({ from, to }: typeof priceInitial) => {
-    setPrice({ from: from === "" ? null : +from, to: to === "" ? null : +to });
+  const handlePriceSubmit = (price: typeof priceInitial) => {
+    setPrice(price);
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      if (price.from === "") {
+        next.delete("priceFrom");
+      } else {
+        next.set("priceFrom", price.from);
+      }
+      if (price.to === "") {
+        next.delete("priceTo");
+      } else {
+        next.set("priceTo", price.to);
+      }
+      return next;
+    });
+    return;
   };
 
   return (
     <Box padding="2">
-      <Flex pb="4" gap="4">
-        <Select placeholder={t("type")} onChange={handleTypeChange}>
+      <Flex pb="4" gap="4" wrap="wrap">
+        <Select
+          placeholder={t("type")}
+          onChange={handleTypeChange}
+          value={type}
+          flex="150px 1 0"
+        >
           <option value="flat">{t("flat")}</option>
           <option value="house">{t("house")}</option>
         </Select>
-        <Select placeholder={t("rooms")} onChange={handleRoomsChange}>
+        <Select
+          placeholder={t("rooms")}
+          onChange={handleRoomsChange}
+          value={rooms}
+          flex="150px 1 0"
+        >
           <option value="1">1</option>
           <option value="2">2</option>
           <option value="3">3</option>
@@ -130,7 +175,7 @@ export const EstateList: FC = () => {
         </Select>
         <Popover>
           <PopoverTrigger>
-            <Button flexBasis="300px">{t("price")}</Button>
+            <Button flex="150px 1 0">{t("price")}</Button>
           </PopoverTrigger>
           <PopoverContent>
             <PopoverArrow />

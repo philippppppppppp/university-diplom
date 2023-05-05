@@ -40,10 +40,10 @@ export const useEstateList = ({
   priceFrom,
   priceTo,
 }: {
-  type?: EstateType | null;
-  rooms?: EstateRooms | null;
-  priceFrom?: number | null;
-  priceTo?: number | null;
+  type?: string;
+  rooms?: string;
+  priceFrom?: string;
+  priceTo?: string;
 }) => {
   const { request } = useApi();
   return useQuery(
@@ -55,10 +55,10 @@ export const useEstateList = ({
           filters: {
             ...(!!type && { type: { _eq: type } }),
             ...(!!rooms && { rooms: { _eq: rooms } }),
-            ...((priceFrom !== null || priceTo !== null) && {
+            ...((!!priceFrom || !!priceTo) && {
               priceUAH: {
-                ...(priceFrom !== null && { _gte: priceFrom }),
-                ...(priceTo !== null && { _lte: priceTo }),
+                ...(!!priceFrom && { _gte: priceFrom }),
+                ...(!!priceTo && { _lte: priceTo }),
               },
             }),
           },
