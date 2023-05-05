@@ -44,7 +44,10 @@ export const ApiProvider: FC<PropsWithChildren> = ({ children }) => {
 
   requestInterceptorRef.current = instanceRef.current.interceptors.request.use(
     (config) => {
-      config.headers.Authorization = `Bearer ${tokenService.get()}`;
+      const token = tokenService.get();
+      if (!!token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
       return config;
     }
   );

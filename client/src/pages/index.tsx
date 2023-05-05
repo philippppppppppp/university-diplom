@@ -8,6 +8,8 @@ import { LoginPage } from "./login-page/LoginPage";
 import { useAuth } from "../shared/auth";
 import { RegisterPage } from "./register-page/RegisterPage";
 import { ActivationPage } from "./activation-page";
+import { Sell } from "./sell";
+import { EstateListPage } from "./list";
 
 export const Routes: React.FC = () => {
   const { authenticated } = useAuth();
@@ -25,6 +27,14 @@ export const Routes: React.FC = () => {
     {
       path: "/activate/:token",
       element: <ActivationPage />,
+    },
+    {
+      path: "/estate/new",
+      element: authenticated ? <Sell /> : <Navigate to="/register" />,
+    },
+    {
+      path: "/estate",
+      element: <EstateListPage />,
     },
   ]);
   return <RouterProvider router={router} />;

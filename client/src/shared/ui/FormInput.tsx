@@ -4,7 +4,7 @@ import { Field } from "formik";
 interface Props {
   onClick?: () => void;
   placeholder: string;
-  type?: "email" | "text";
+  type?: "email" | "text" | "number";
   name: string;
   disabled?: boolean;
   autoComplete?: string;

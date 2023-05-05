@@ -8,6 +8,7 @@ const query = gql`
     users_by_pk(id: $id) {
       id
       name
+      email
     }
   }
 `;
@@ -21,7 +22,7 @@ export const useViewer = () => {
   const { request } = useApi();
   const { authenticated, userId } = useAuth();
   return useQuery(
-    ["user"],
+    ["user", userId],
     async () => {
       const { users_by_pk } = await request<ByPkResponse<Viewer>>(query, {
         id: userId,

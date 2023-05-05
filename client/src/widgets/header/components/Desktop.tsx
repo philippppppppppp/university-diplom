@@ -37,15 +37,15 @@ export const Desktop: React.FC = () => {
               {t("buy")}
             </MenuButton>
             <MenuList>
-              <MenuItem as={Link} to="/buy/flat">
+              <MenuItem as={Link} to="/estate">
                 {t("buy_flat")}
               </MenuItem>
-              <MenuItem as={Link} to="/buy/house">
+              <MenuItem as={Link} to="/estate">
                 {t("buy_house")}
               </MenuItem>
             </MenuList>
           </Menu>
-          <Button as={Link} fontSize="20" to="/sell" variant="link">
+          <Button as={Link} fontSize="20" to="/estate/new" variant="link">
             {t("sell")}
           </Button>
           <Flex gap={8}>
