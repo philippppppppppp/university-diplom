@@ -30,15 +30,21 @@ interface Provider {
   translations: Record<Language, object>;
 }
 
+const languageKey = "LANGUAGE";
+
 export const TranslationsProvider: React.FC<PropsWithChildren<Provider>> = ({
   children,
   translations,
   initialLanguage,
 }) => {
-  const [selectedLanguage, setSelectedLanguage] =
-    useState<Language>(initialLanguage);
+  const [selectedLanguage, setSelectedLanguage] = useState<Language>(
+    () => localStorage.getItem(languageKey) ?? initialLanguage
+  );
 
-  const selectLanguage = (language: Language) => setSelectedLanguage(language);
+  const selectLanguage = (language: Language) => {
+    localStorage.setItem(languageKey, language);
+    setSelectedLanguage(language);
+  };
 
   const t = (arg: TranslationObject | TranslationKey) => {
     const selectedLanguageTranslations: any =
