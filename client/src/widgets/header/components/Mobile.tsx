@@ -55,11 +55,14 @@ export const Mobile: React.FC = () => {
               </Container>
               <Divider />
               <DrawerBody as={Flex} direction="column" fontSize="18">
+                <LinkUi as={Link} to="/estate">
+                  {t("buyAll")}
+                </LinkUi>
                 <LinkUi as={Link} to="/estate?type=flat">
-                  {t("buy_flat")}
+                  {t("buyFlat")}
                 </LinkUi>
                 <LinkUi as={Link} to="/estate?type=house">
-                  {t("buy_house")}
+                  {t("buyHouse")}
                 </LinkUi>
               </DrawerBody>
               <Divider />

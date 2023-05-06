@@ -37,11 +37,14 @@ export const Desktop: React.FC = () => {
               {t("buy")}
             </MenuButton>
             <MenuList>
+              <MenuItem as={Link} to="/estate">
+                {t("buyAll")}
+              </MenuItem>
               <MenuItem as={Link} to="/estate?type=flat">
-                {t("buy_flat")}
+                {t("buyFlat")}
               </MenuItem>
               <MenuItem as={Link} to="/estate?type=house">
-                {t("buy_house")}
+                {t("buyHouse")}
               </MenuItem>
             </MenuList>
           </Menu>
