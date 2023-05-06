@@ -39,7 +39,3 @@ export const ApiProvider: FC<PropsWithChildren<Props>> = ({
 };
 
 export const useApi = () => useContext(context);
-
-export interface ByPkResponse<T> {
-  users_by_pk: T;
-}

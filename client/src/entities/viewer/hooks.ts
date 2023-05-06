@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { ByPkResponse, useApi } from "../../shared/api";
+import { useApi } from "../../shared/api";
 import { gql } from "graphql-request";
 import { useAuth } from "../../shared/auth";
 
@@ -24,7 +24,7 @@ export const useViewer = () => {
   return useQuery(
     ["user", userId],
     async () => {
-      const { users_by_pk } = await request<ByPkResponse<Viewer>>(query, {
+      const { users_by_pk } = await request<{ users_by_pk: Viewer }>(query, {
         id: userId,
       });
       return users_by_pk;
