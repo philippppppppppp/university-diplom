@@ -1,3 +1,6 @@
 export const getDateString = (date: string) => {
-  return new Date(date).toLocaleDateString("uk-UA");
+  const dateObj = new Date(date);
+  const formatedDate = dateObj.toLocaleDateString("uk-UA");
+  const [hours, minutes] = dateObj.toLocaleTimeString().split(":");
+  return `${formatedDate} ${hours}:${minutes}`;
 };

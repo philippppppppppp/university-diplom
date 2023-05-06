@@ -122,7 +122,7 @@ export const insertUser = async (
 };
 
 const updateLastOnlineQuery = gql`
-  mutation ($id: uuid!, $time: timestamp) {
+  mutation ($id: uuid!, $time: timestamptz) {
     update_users_by_pk(pk_columns: { id: $id }, _set: { lastOnline: $time }) {
       id
       email

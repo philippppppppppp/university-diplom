@@ -12,8 +12,8 @@ export const Gallery: React.FC<Props> = ({ images }) => {
   return (
     <Swiper modules={[Scrollbar]} scrollbar={{ hide: false }} centeredSlides>
       {images.map((i) => (
-        <SwiperSlide>
-          <Image width="100%" maxH="500px" objectFit="cover" src={i} key={i} />
+        <SwiperSlide key={i}>
+          <Image width="100%" maxH="500px" objectFit="cover" src={i} />
         </SwiperSlide>
       ))}
     </Swiper>
