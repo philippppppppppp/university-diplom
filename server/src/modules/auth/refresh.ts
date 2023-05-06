@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { config } from "../../config";
 import * as RefreshTokens from "../../services/refreshTokens";
 import { getAccessToken, getRefreshToken } from "../../services/tokens";
+import { updateLastOnline } from "../../services/users";
 
 export const refreshHandler = async (req: Request, res: Response) => {
   try {
@@ -21,6 +22,7 @@ export const refreshHandler = async (req: Request, res: Response) => {
     }
     await RefreshTokens.remove(refresh);
     const { userId } = entry;
+    await updateLastOnline(userId);
     const refreshToken = getRefreshToken(userId);
     await RefreshTokens.add(refreshToken, userId);
     return res

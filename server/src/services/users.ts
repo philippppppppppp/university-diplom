@@ -7,24 +7,26 @@ const client = new GraphQLClient(hasuraUrl, {
   headers: { "x-hasura-admin-secret": hasuraAdminSecret },
 });
 
-//TODO: handle errors
-
 interface User {
   id: string;
   email: string;
   password: string;
   name: string;
+  phone: string;
   activated: boolean;
+  lastOnline: string | null;
 }
 
 const getUserByIdQuery = gql`
   query getUserById($id: uuid!) {
     users_by_pk(id: $id) {
-      activated
-      email
       id
-      name
+      email
       password
+      name
+      phone
+      activated
+      lastOnline
     }
   }
 `;
@@ -42,11 +44,13 @@ export const getUserById = async (id: string) => {
 const activateUserQuery = gql`
   mutation activateUser($id: uuid!) {
     update_users_by_pk(pk_columns: { id: $id }, _set: { activated: true }) {
-      activated
-      email
       id
-      name
+      email
       password
+      name
+      phone
+      activated
+      lastOnline
     }
   }
 `;
@@ -68,7 +72,9 @@ const getUserByEmailQuery = gql`
       email
       password
       name
+      phone
       activated
+      lastOnline
     }
   }
 `;
@@ -92,7 +98,9 @@ const insertUserQuery = gql`
       email
       password
       name
+      phone
       activated
+      lastOnline
     }
   }
 `;
@@ -111,4 +119,28 @@ export const insertUser = async (
     }
   );
   return insert_users_one;
+};
+
+const updateLastOnlineQuery = gql`
+  mutation ($id: uuid!, $time: timestamp) {
+    update_users_by_pk(pk_columns: { id: $id }, _set: { lastOnline: $time }) {
+      id
+      email
+      password
+      name
+      phone
+      activated
+      lastOnline
+    }
+  }
+`;
+
+export const updateLastOnline = async (id: string) => {
+  const { update_users_by_pk } = await client.request<{
+    update_users_by_pk: User;
+  }>(updateLastOnlineQuery, {
+    id,
+    time: new Date().toISOString(),
+  });
+  return update_users_by_pk;
 };

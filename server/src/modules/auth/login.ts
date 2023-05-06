@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
 import { config } from "../../config";
-import { getUserByEmail } from "../../services/users";
+import { getUserByEmail, updateLastOnline } from "../../services/users";
 import * as RefreshTokens from "../../services/refreshTokens";
 import { getAccessToken, getRefreshToken } from "../../services/tokens";
 
@@ -38,6 +38,7 @@ export const loginHandler = async (req: Request, res: Response) => {
         message: "INVALID_CREDENTIALS",
       });
     }
+    await updateLastOnline(user.id);
     const refreshToken = getRefreshToken(user.id);
     await RefreshTokens.add(refreshToken, user.id);
     return res
