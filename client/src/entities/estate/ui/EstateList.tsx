@@ -17,12 +17,15 @@ import {
   PopoverContent,
   PopoverBody,
   PopoverArrow,
+  Tag,
 } from "@chakra-ui/react";
 import { useEstateList, EstateItem } from "../hooks";
 import { Link, useSearchParams } from "react-router-dom";
 import { useTranslation } from "../../../shared/translations";
 import { Formik, Form } from "formik";
 import { FormInput } from "../../../shared/ui";
+import { getPriceString } from "../../../shared/getPriceString";
+import { getDateString } from "../../../shared/getDateString";
 
 type CardProps = EstateItem;
 
@@ -34,7 +37,7 @@ const Card: FC<CardProps> = ({
   address,
   priceUAH,
   createdAt,
-  areaM2,
+  livingAreaM2,
   rooms,
 }) => {
   const { t } = useTranslation();
@@ -54,17 +57,22 @@ const Card: FC<CardProps> = ({
       />
       <Stack>
         <CardBody>
-          <Text pb="1">{priceUAH} ₴</Text>
+          <Text pb="1">{getPriceString(priceUAH)}</Text>
           <Heading size="md">{title}</Heading>
-          {!!address && <Text py="2">{address}</Text>}
+          <Text py="2">{address}</Text>
           {!!description && <Text py="2">{description}</Text>}
-          <Text py="2">
-            {t("rooms")}: {rooms}, {t("area")}: {areaM2}м²
-          </Text>
+          <Flex py="2" gap="2">
+            <Tag>
+              {t("rooms")}: {rooms}
+            </Tag>
+            <Tag>
+              {t("totalArea")}: {livingAreaM2}м²
+            </Tag>
+          </Flex>
         </CardBody>
         <CardFooter>
           <Text>
-            {t("published")}: {new Date(createdAt).toLocaleDateString()}
+            {t("published")}: {getDateString(createdAt)}
           </Text>
         </CardFooter>
       </Stack>

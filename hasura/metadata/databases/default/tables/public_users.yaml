@@ -6,14 +6,18 @@ select_permissions:
     permission:
       columns:
         - id
+        - lastOnline
         - name
+        - phone
       filter: {}
   - role: user
     permission:
       columns:
         - email
         - id
+        - lastOnline
         - name
+        - phone
       filter:
         id:
           _eq: X-Hasura-User-Id

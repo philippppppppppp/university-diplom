@@ -9,30 +9,32 @@ select_permissions:
   - role: anonymous
     permission:
       columns:
-        - id
-        - author_id
-        - title
-        - description
-        - images
         - address
-        - priceUAH
+        - author_id
         - createdAt
-        - type
+        - description
+        - id
+        - images
+        - kitchenAreaM2
+        - livingAreaM2
+        - priceUAH
         - rooms
-        - areaM2
+        - title
+        - type
       filter: {}
   - role: user
     permission:
       columns:
+        - address
+        - author_id
+        - createdAt
+        - description
+        - id
         - images
-        - areaM2
+        - kitchenAreaM2
+        - livingAreaM2
         - priceUAH
         - rooms
-        - address
-        - description
         - title
         - type
-        - createdAt
-        - author_id
-        - id
       filter: {}

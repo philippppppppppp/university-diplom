@@ -2,6 +2,24 @@ import { useQuery } from "@tanstack/react-query";
 import { gql } from "graphql-request";
 import { useApi } from "../../shared/api";
 
+export type EstateType = "house" | "flat";
+
+export interface EstateItem {
+  id: string;
+  title: string;
+  description?: string;
+  images: string[];
+  address: string;
+  priceUAH: number;
+  createdAt: string;
+  rooms: number;
+  livingAreaM2: number;
+  kitchenAreaM2: number;
+  type: EstateType;
+}
+
+export type EstateRooms = 1 | 2 | 3 | 4;
+
 const estateListQuery = gql`
   query ($filters: estate_bool_exp) {
     estate(where: $filters) {
@@ -13,26 +31,11 @@ const estateListQuery = gql`
       createdAt
       description
       rooms
-      areaM2
+      livingAreaM2
+      kitchenAreaM2
     }
   }
 `;
-
-export interface EstateItem {
-  id: string;
-  title: string;
-  description?: string;
-  images: string[];
-  address?: string;
-  priceUAH: number;
-  createdAt: string;
-  rooms: number;
-  areaM2: number;
-}
-
-export type EstateType = "house" | "flat";
-
-export type EstateRooms = 1 | 2 | 3 | 4;
 
 export const useEstateList = ({
   type,
@@ -65,6 +68,53 @@ export const useEstateList = ({
         }
       );
       return estate;
+    }
+  );
+};
+
+interface Author {
+  name: string;
+  phone: string;
+  lastOnline?: string;
+}
+
+const estateQuery = gql`
+  query ($id: uuid!) {
+    estate_by_pk(id: $id) {
+      address
+      livingAreaM2
+      kitchenAreaM2
+      createdAt
+      description
+      id
+      images
+      priceUAH
+      rooms
+      title
+      type
+      author {
+        name
+        phone
+        lastOnline
+      }
+    }
+  }
+`;
+
+export const useEstate = (id?: string) => {
+  const { request } = useApi();
+  return useQuery(
+    ["estate-item", id],
+    async () => {
+      const { estate_by_pk } = await request<{
+        estate_by_pk: EstateItem & { author: Author };
+      }>(estateQuery, {
+        id,
+      });
+      return estate_by_pk;
+    },
+    {
+      enabled: !!id,
     }
   );
 };

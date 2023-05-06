@@ -10,6 +10,7 @@ import { RegisterPage } from "./register-page/RegisterPage";
 import { ActivationPage } from "./activation-page";
 import { Sell } from "./sell";
 import { EstateListPage } from "./list";
+import { ItemPage } from "./item/ItemPage";
 
 export const Routes: React.FC = () => {
   const { authenticated } = useAuth();
@@ -29,12 +30,16 @@ export const Routes: React.FC = () => {
       element: <ActivationPage />,
     },
     {
+      path: "/estate",
+      element: <EstateListPage />,
+    },
+    {
       path: "/estate/new",
       element: authenticated ? <Sell /> : <Navigate to="/register" />,
     },
     {
-      path: "/estate",
-      element: <EstateListPage />,
+      path: "/estate/:id",
+      element: <ItemPage />,
     },
   ]);
   return <RouterProvider router={router} />;
