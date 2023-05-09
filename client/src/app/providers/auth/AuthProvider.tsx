@@ -80,7 +80,7 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
     ({ response }: AxiosError<ErrorSchema>) => {
       const error = response!.data;
       if (messagesToForward.includes(error.message)) throw error;
-      if (messagesNotToHandle.includes(error.message)) return;
+      if (messagesNotToHandle.includes(error.message)) throw error;
       toast({
         title: error.message,
         description: error.details,

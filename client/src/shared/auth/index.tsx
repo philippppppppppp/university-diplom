@@ -72,6 +72,7 @@ export const AuthProvider: FC<PropsWithChildren<Props>> = ({
 }) => {
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [initiallyRefreshed, setInitiallyRefreshed] = useState(false);
   const refreshRequestRef = useRef<null | ReturnType<Auth["refresh"]>>(null);
   const authenticated = !!userId;
 
@@ -144,18 +145,22 @@ export const AuthProvider: FC<PropsWithChildren<Props>> = ({
     }
   }, [client]);
 
-  const refreshOnMount = useCallback(async () => {
-    if (!refreshRequestRef.current) {
-      refreshRequestRef.current = refresh();
-    }
-    await refreshRequestRef.current;
+  useEffect(() => {
+    const initiallyRefresh = async () => {
+      try {
+        if (!refreshRequestRef.current) {
+          refreshRequestRef.current = refresh();
+        }
+        await refreshRequestRef.current;
+      } catch (err) {
+      } finally {
+        setInitiallyRefreshed(true);
+      }
+    };
+    initiallyRefresh();
   }, [refresh]);
 
-  useEffect(() => {
-    refreshOnMount();
-  }, [refreshOnMount]);
-
-  if (loading) {
+  if (!initiallyRefreshed) {
     return null;
   }
 
