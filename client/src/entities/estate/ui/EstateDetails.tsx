@@ -1,22 +1,29 @@
 import { Flex, Heading, Text, Badge, Tag, Button, Box } from "@chakra-ui/react";
 import { Gallery } from "../../../shared/ui";
-import { StarIcon } from "@chakra-ui/icons";
+import { EditIcon, StarIcon } from "@chakra-ui/icons";
 import { useTranslation } from "../../../shared/translations";
 import { EstateItem } from "../hooks";
 import { getPriceString } from "../../../shared/getPriceString";
 import { getDateString } from "../../../shared/getDateString";
 
-export const EstateDetails: React.FC<EstateItem> = ({
-  title,
-  address,
-  priceUAH,
-  rooms,
-  livingAreaM2,
-  kitchenAreaM2,
-  description,
-  createdAt,
+interface Props {
+  details: EstateItem;
+  isAuthor: boolean;
+}
 
-  images,
+export const EstateDetails: React.FC<Props> = ({
+  isAuthor,
+  details: {
+    title,
+    address,
+    priceUAH,
+    rooms,
+    livingAreaM2,
+    kitchenAreaM2,
+    description,
+    createdAt,
+    images,
+  },
 }) => {
   const { t } = useTranslation();
   return (
@@ -46,7 +53,11 @@ export const EstateDetails: React.FC<EstateItem> = ({
           gap="2"
         >
           <Heading size="lg">{title}</Heading>
-          <Button leftIcon={<StarIcon />}>{t("toFavorites")}</Button>
+          {isAuthor ? (
+            <Button leftIcon={<EditIcon />}>{t("edit")}</Button>
+          ) : (
+            <Button leftIcon={<StarIcon />}>{t("toFavorites")}</Button>
+          )}
         </Flex>
         <Badge fontSize={20}>{address}</Badge>
         <Heading size="lg">{getPriceString(priceUAH)}</Heading>

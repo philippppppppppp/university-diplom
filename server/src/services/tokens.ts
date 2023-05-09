@@ -10,10 +10,9 @@ export const getAccessToken = (id: string) =>
     {
       id,
       "https://hasura.io/jwt/claims": {
-        "x-hasura-role": "user",
         "x-hasura-user-id": id,
-        "x-hasura-default-role": "user",
-        "x-hasura-allowed-roles": ["user"],
+        "x-hasura-default-role": "anonymous",
+        "x-hasura-allowed-roles": ["user", "anonymous"],
       },
     },
     config.jwtAccessSecret,

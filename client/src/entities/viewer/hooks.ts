@@ -24,8 +24,12 @@ export const useViewer = () => {
   return useQuery(
     ["user", userId],
     async () => {
-      const { users_by_pk } = await request<{ users_by_pk: Viewer }>(query, {
-        id: userId,
+      const { users_by_pk } = await request<{ users_by_pk: Viewer }>({
+        query,
+        variables: {
+          id: userId,
+        },
+        role: "user",
       });
       return users_by_pk;
     },

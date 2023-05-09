@@ -10,14 +10,32 @@ export type Query = string;
 
 export type Variables = object;
 
+export type Role = "anonymous" | "user";
+
 interface Context {
-  request<T>(query: Query, variables?: Variables): Promise<T>;
+  request<T>({
+    query,
+    variables,
+    role = "anonymous",
+  }: {
+    query: Query;
+    variables?: Variables;
+    role?: Role;
+  }): Promise<T>;
 }
 
 const context = createContext({} as Context);
 
 export interface Client {
-  request<T>(query: Query, variables?: Variables): Promise<T>;
+  request<T>({
+    query,
+    variables,
+    role = "anonymous",
+  }: {
+    query: Query;
+    variables?: Variables;
+    role?: Role;
+  }): Promise<T>;
 }
 
 interface Props {
@@ -29,8 +47,16 @@ export const ApiProvider: FC<PropsWithChildren<Props>> = ({
   children,
 }) => {
   const request = useCallback(
-    async <T,>(query: Query, variables?: Variables): Promise<T> => {
-      return await client.request<T>(query, variables);
+    async <T,>({
+      query,
+      variables,
+      role,
+    }: {
+      query: Query;
+      variables?: Variables;
+      role?: Role;
+    }): Promise<T> => {
+      return await client.request<T>({ query, variables, role });
     },
     [client]
   );

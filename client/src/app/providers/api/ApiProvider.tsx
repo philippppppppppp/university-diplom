@@ -7,6 +7,7 @@ import {
   Client,
   Query,
   Variables,
+  Role,
 } from "../../../shared/api";
 
 const queryClient = new QueryClient();
@@ -26,11 +27,27 @@ export const ApiProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const apiClient: Client = useMemo(() => {
     return {
-      async request<T>(query: Query, variables: Variables) {
-        const { data } = await instanceRef.current.post<T>("", {
-          query,
-          variables,
-        });
+      async request<T>({
+        query,
+        variables,
+        role = "anonymous",
+      }: {
+        query: Query;
+        variables?: Variables;
+        role?: Role;
+      }) {
+        const { data } = await instanceRef.current.post<T>(
+          "",
+          {
+            query,
+            variables,
+          },
+          {
+            headers: {
+              "x-hasura-role": role,
+            },
+          }
+        );
         return data;
       },
     };

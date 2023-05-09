@@ -155,6 +155,10 @@ export const AuthProvider: FC<PropsWithChildren<Props>> = ({
     refreshOnMount();
   }, [refreshOnMount]);
 
+  if (loading) {
+    return null;
+  }
+
   return (
     <context.Provider
       value={{

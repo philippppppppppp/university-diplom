@@ -14,7 +14,9 @@ import { getDateString } from "../../../shared/getDateString";
 import { getPhoneString } from "../../../shared/getPhoneString";
 import { User } from "../hooks";
 
-export const UserCard: React.FC<User> = ({ name, lastOnline, phone }) => {
+export const UserCard: React.FC<{ user: User }> = ({
+  user: { name, lastOnline, phone },
+}) => {
   const { t } = useTranslation();
   return (
     <Card>

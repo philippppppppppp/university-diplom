@@ -52,9 +52,9 @@ export const useEstateList = ({
   return useQuery(
     ["estate-list", type, rooms, priceFrom, priceTo],
     async () => {
-      const { estate } = await request<{ estate: EstateItem[] }>(
-        estateListQuery,
-        {
+      const { estate } = await request<{ estate: EstateItem[] }>({
+        query: estateListQuery,
+        variables: {
           filters: {
             ...(!!type && { type: { _eq: type } }),
             ...(!!rooms && { rooms: { _eq: rooms } }),
@@ -65,14 +65,17 @@ export const useEstateList = ({
               },
             }),
           },
-        }
-      );
+        },
+      });
       return estate;
     }
   );
 };
 
+// TODO: FIX PHONE MANDATORY
+
 interface Author {
+  id: string;
   name: string;
   phone: string;
   lastOnline?: string;
@@ -93,6 +96,7 @@ const estateQuery = gql`
       title
       type
       author {
+        id
         name
         phone
         lastOnline
@@ -108,8 +112,11 @@ export const useEstate = (id?: string) => {
     async () => {
       const { estate_by_pk } = await request<{
         estate_by_pk: EstateItem & { author: Author };
-      }>(estateQuery, {
-        id,
+      }>({
+        query: estateQuery,
+        variables: {
+          id,
+        },
       });
       return estate_by_pk;
     },
