@@ -10,7 +10,12 @@ interface Props {
 
 export const Gallery: React.FC<Props> = ({ images }) => {
   return (
-    <Swiper modules={[Scrollbar]} scrollbar={{ hide: false }} centeredSlides>
+    <Swiper
+      modules={[Scrollbar]}
+      scrollbar={{ hide: false }}
+      centeredSlides
+      style={{ zIndex: 0 }}
+    >
       {images.map((i) => (
         <SwiperSlide key={i}>
           <Image width="100%" maxH="500px" objectFit="cover" src={i} />

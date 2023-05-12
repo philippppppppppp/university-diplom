@@ -72,7 +72,6 @@ export const AuthProvider: FC<PropsWithChildren<Props>> = ({
 }) => {
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [initiallyRefreshed, setInitiallyRefreshed] = useState(false);
   const refreshRequestRef = useRef<null | ReturnType<Auth["refresh"]>>(null);
   const authenticated = !!userId;
 
@@ -147,22 +146,13 @@ export const AuthProvider: FC<PropsWithChildren<Props>> = ({
 
   useEffect(() => {
     const initiallyRefresh = async () => {
-      try {
-        if (!refreshRequestRef.current) {
-          refreshRequestRef.current = refresh();
-        }
-        await refreshRequestRef.current;
-      } catch (err) {
-      } finally {
-        setInitiallyRefreshed(true);
+      if (!refreshRequestRef.current) {
+        refreshRequestRef.current = refresh();
       }
+      await refreshRequestRef.current;
     };
     initiallyRefresh();
   }, [refresh]);
-
-  if (!initiallyRefreshed) {
-    return null;
-  }
 
   return (
     <context.Provider

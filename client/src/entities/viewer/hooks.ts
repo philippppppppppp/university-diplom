@@ -9,6 +9,7 @@ const query = gql`
       id
       name
       email
+      favorites
     }
   }
 `;
@@ -16,13 +17,15 @@ const query = gql`
 interface Viewer {
   id: string;
   name: string;
+  email: string;
+  favorites: string[];
 }
 
 export const useViewer = () => {
   const { request } = useApi();
   const { authenticated, userId } = useAuth();
   return useQuery(
-    ["user", userId],
+    ["viewer", userId],
     async () => {
       const { users_by_pk } = await request<{ users_by_pk: Viewer }>({
         query,

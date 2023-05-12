@@ -10,7 +10,7 @@ import {
   Role,
 } from "../../../shared/api";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({});
 
 const refreshRetry = new Set<AxiosRequestConfig>();
 

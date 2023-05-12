@@ -1,6 +1,5 @@
-import { Flex, Heading, Text, Badge, Tag, Button, Box } from "@chakra-ui/react";
+import { Flex, Heading, Text, Badge, Tag, Box } from "@chakra-ui/react";
 import { Gallery } from "../../../shared/ui";
-import { EditIcon, StarIcon } from "@chakra-ui/icons";
 import { useTranslation } from "../../../shared/translations";
 import { EstateItem } from "../hooks";
 import { getPriceString } from "../../../shared/getPriceString";
@@ -9,10 +8,11 @@ import { getDateString } from "../../../shared/getDateString";
 interface Props {
   details: EstateItem;
   isAuthor: boolean;
+  action: JSX.Element | null;
 }
 
 export const EstateDetails: React.FC<Props> = ({
-  isAuthor,
+  action,
   details: {
     title,
     address,
@@ -53,11 +53,7 @@ export const EstateDetails: React.FC<Props> = ({
           gap="2"
         >
           <Heading size="lg">{title}</Heading>
-          {isAuthor ? (
-            <Button leftIcon={<EditIcon />}>{t("edit")}</Button>
-          ) : (
-            <Button leftIcon={<StarIcon />}>{t("toFavorites")}</Button>
-          )}
+          {action}
         </Flex>
         <Badge fontSize={20}>{address}</Badge>
         <Heading size="lg">{getPriceString(priceUAH)}</Heading>
