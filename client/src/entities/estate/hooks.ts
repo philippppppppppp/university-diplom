@@ -72,8 +72,6 @@ export const useEstateList = ({
   );
 };
 
-// TODO: FIX PHONE MANDATORY
-
 interface Author {
   id: string;
   name: string;

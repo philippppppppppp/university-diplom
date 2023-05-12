@@ -23,15 +23,16 @@ interface TokenResponse {
   token: AuthToken;
 }
 
-const messagesToForward = [
+const messagesToShow = [
   "INVALID_CREDENTIALS",
   "NOT_ACTIVATED",
   "EMAIL_ALREADY_REGISTERED",
+  "PHONE_ALREADY_REGISTERED",
   "INVALID_ACTIVATION_TOKEN",
   "ACTIVATION_TOKEN_EXPIRED",
   "USER_ALREADY_ACTIVATED",
+  "INVALID_TOKEN",
 ];
-const messagesNotToHandle = ["INVALID_TOKEN"];
 
 export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
   const toast = useToast();
@@ -79,13 +80,14 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
     (res) => res,
     ({ response }: AxiosError<ErrorSchema>) => {
       const error = response!.data;
-      if (messagesToForward.includes(error.message)) throw error;
-      if (messagesNotToHandle.includes(error.message)) throw error;
-      toast({
-        title: error.message,
-        description: error.details,
-        status: "error",
-      });
+      if (!messagesToShow.includes(error.message)) {
+        toast({
+          title: error.message,
+          description: error.details,
+          status: "error",
+        });
+      }
+      throw error;
     }
   );
 

@@ -89,10 +89,39 @@ export const getUserByEmail = async (email: string) => {
   return users[0];
 };
 
+const getUserByPhoneQuery = gql`
+  query getUserByPhone($phone: String) {
+    users(where: { phone: { _eq: $phone } }) {
+      id
+      email
+      password
+      name
+      phone
+      activated
+      lastOnline
+    }
+  }
+`;
+
+export const getUserByPhone = async (phone: string) => {
+  const { users } = await client.request<{ users: User[] }>(
+    getUserByPhoneQuery,
+    {
+      phone,
+    }
+  );
+  return users[0];
+};
+
 const insertUserQuery = gql`
-  mutation insertUser($email: String, $name: String, $password: String) {
+  mutation insertUser(
+    $email: String
+    $name: String
+    $password: String
+    $phone: String
+  ) {
     insert_users_one(
-      object: { email: $email, name: $name, password: $password }
+      object: { email: $email, name: $name, password: $password, phone: $phone }
     ) {
       id
       email
@@ -108,7 +137,8 @@ const insertUserQuery = gql`
 export const insertUser = async (
   email: string,
   password: string,
-  name: string
+  name: string,
+  phone: string
 ) => {
   const { insert_users_one } = await client.request<{ insert_users_one: User }>(
     insertUserQuery,
@@ -116,6 +146,7 @@ export const insertUser = async (
       email,
       password,
       name,
+      phone,
     }
   );
   return insert_users_one;

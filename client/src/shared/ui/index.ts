@@ -4,3 +4,4 @@ export { FormPasswordInput } from "./FormPasswordInput";
 export { MinimalHeader } from "./MinimalHeader";
 export { MinimalLayout } from "./MinimalLayout";
 export { Gallery } from "./Gallery";
+export { FormPhoneInput } from "./FormPhoneInput";

@@ -3,7 +3,11 @@ import { useTranslation } from "../../../shared/translations";
 import { Formik, Form, FormikHelpers } from "formik";
 import { useAuth, RegisterData } from "../../../shared/auth";
 import { object, string } from "yup";
-import { FormInput, FormPasswordInput } from "../../../shared/ui";
+import {
+  FormInput,
+  FormPasswordInput,
+  FormPhoneInput,
+} from "../../../shared/ui";
 import { FormError } from "../../../shared/ui/FormError";
 
 type RegisterValues = RegisterData & { confirmPassword: string };
@@ -11,6 +15,7 @@ type RegisterValues = RegisterData & { confirmPassword: string };
 const initialValues: RegisterValues = {
   email: "",
   name: "",
+  phone: "",
   password: "",
   confirmPassword: "",
 };
@@ -42,6 +47,7 @@ const credentialsSchema = object({
     .min(minNameLength, nameLengthTranslationObject)
     .max(maxNameLength, nameLengthTranslationObject)
     .required("registerRequiredFields"),
+  phone: string().length(10, "phoneLength").required("registerRequiredFields"),
   password: string()
     .min(minPasswordLength, passwordLengthTranslationObject)
     .max(maxPasswordLength, passwordLengthTranslationObject)
@@ -104,6 +110,7 @@ export const RegisterForm: React.FC<Props> = ({
             disabled={loading}
             autoComplete="name"
           />
+          <FormPhoneInput autoComplete="phone" disabled={loading} />
           <FormPasswordInput
             placeholder={t("password")}
             name="password"

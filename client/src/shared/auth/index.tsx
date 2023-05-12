@@ -19,7 +19,7 @@ export interface Credentials {
   password: string;
 }
 
-export type RegisterData = Credentials & { name: string };
+export type RegisterData = Credentials & { name: string; phone: string };
 
 interface Auth {
   userId: null | string;
