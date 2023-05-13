@@ -1,6 +1,6 @@
 import { useEstate } from "../../entities/estate/hooks";
 import { UserCard } from "../../entities/user";
-import { EstateDetails } from "../../entities/estate/ui";
+import { EstateItemInfo } from "../../entities/estate";
 import { Box, Flex, Button } from "@chakra-ui/react";
 import { useAuth } from "../../shared/auth";
 import { FavoritesButton } from "../../features/favorites-button";
@@ -34,7 +34,7 @@ export const EstateItem: React.FC<Props> = ({ id }) => {
 
   return (
     <Flex direction="column" gap="8">
-      <EstateDetails details={details} isAuthor={isAuthor} action={action} />
+      <EstateItemInfo details={details} isAuthor={isAuthor} action={action} />
       {!isAuthor && (
         <Box pr={{ base: "0", md: "200px" }}>
           <UserCard user={author} />

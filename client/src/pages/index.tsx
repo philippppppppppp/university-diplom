@@ -3,14 +3,14 @@ import {
   Navigate,
   RouterProvider,
 } from "react-router-dom";
-import { HomePage } from "./home-page";
-import { LoginPage } from "./login-page/LoginPage";
 import { useAuth } from "../shared/auth";
-import { RegisterPage } from "./register-page/RegisterPage";
+import { HomePage } from "./home-page";
+import { LoginPage } from "./login-page";
+import { RegisterPage } from "./register-page";
 import { ActivationPage } from "./activation-page";
-import { Sell } from "./sell";
-import { EstateListPage } from "./list";
-import { ItemPage } from "./item/ItemPage";
+import { EstateListPage } from "./estate-list";
+import { SellPage } from "./sell";
+import { EstateItemPage } from "./estate-item";
 
 export const Routes: React.FC = () => {
   const { authenticated } = useAuth();
@@ -35,11 +35,11 @@ export const Routes: React.FC = () => {
     },
     {
       path: "/estate/new",
-      element: authenticated ? <Sell /> : <Navigate to="/register" />,
+      element: authenticated ? <SellPage /> : <Navigate to="/register" />,
     },
     {
       path: "/estate/:id",
-      element: <ItemPage />,
+      element: <EstateItemPage />,
     },
   ]);
   return <RouterProvider router={router} />;

@@ -1,6 +1,5 @@
 import { FC, useState } from "react";
 import {
-  Box,
   Card as CardUi,
   CardBody,
   Flex,
@@ -159,7 +158,7 @@ export const EstateList: FC = () => {
   };
 
   return (
-    <Box padding="2">
+    <>
       <Flex pb="4" gap="4" wrap="wrap">
         <Select
           placeholder={t("type")}
@@ -213,6 +212,6 @@ export const EstateList: FC = () => {
           <Text alignSelf="center">{t("noResult")}</Text>
         )}
       </Flex>
-    </Box>
+    </>
   );
 };

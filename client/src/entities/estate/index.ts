@@ -1,2 +1,2 @@
 export { useEstateList } from "./hooks";
-export { EstateList } from "./ui";
+export { EstateList, EstateItemInfo } from "./ui";

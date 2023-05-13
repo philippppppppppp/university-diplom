@@ -4,7 +4,9 @@ import { PropsWithChildren } from "react";
 export const Layout: React.FC<PropsWithChildren> = ({ children }) => {
   return (
     <>
-      <Container maxW={1000}>{children}</Container>
+      <Container maxW={1000} pt="4">
+        {children}
+      </Container>
     </>
   );
 };

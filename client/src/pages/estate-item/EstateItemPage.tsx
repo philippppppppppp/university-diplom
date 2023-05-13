@@ -3,7 +3,7 @@ import { Layout } from "../../shared/ui";
 import { Header } from "../../widgets/header";
 import { EstateItem } from "../../widgets/estate-item";
 
-export const ItemPage: React.FC = () => {
+export const EstateItemPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
 
   return (

@@ -11,7 +11,7 @@ interface Props {
   action: JSX.Element | null;
 }
 
-export const EstateDetails: React.FC<Props> = ({
+export const EstateItemInfo: React.FC<Props> = ({
   action,
   details: {
     title,
@@ -27,10 +27,9 @@ export const EstateDetails: React.FC<Props> = ({
 }) => {
   const { t } = useTranslation();
   return (
-    <>
+    <Flex gap="8" direction="column">
       {!!images?.length && (
         <Flex
-          mt="2"
           direction={{ base: "column", md: "row" }}
           justifyContent="space-between"
         >
@@ -76,6 +75,6 @@ export const EstateDetails: React.FC<Props> = ({
           {t("published")}: {getDateString(createdAt)}
         </Tag>
       </Flex>
-    </>
+    </Flex>
   );
 };

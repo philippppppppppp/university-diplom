@@ -1,2 +1,2 @@
 export { EstateList } from "./EstateList";
-export { EstateDetails } from "./EstateDetails";
+export { EstateItemInfo } from "./EstateItemInfo";
