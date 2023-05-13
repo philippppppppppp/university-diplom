@@ -1,4 +1,3 @@
-import { FC, useState } from "react";
 import {
   Card as CardUi,
   CardBody,
@@ -19,16 +18,17 @@ import {
   Tag,
 } from "@chakra-ui/react";
 import { useEstateList, EstateItem } from "../hooks";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useTranslation } from "../../../shared/translations";
 import { Formik, Form } from "formik";
 import { FormInput } from "../../../shared/ui";
 import { getPriceString } from "../../../shared/getPriceString";
 import { getDateString } from "../../../shared/getDateString";
+import { useFilter } from "../../../shared/filtersService";
 
 type CardProps = EstateItem;
 
-const Card: FC<CardProps> = ({
+const Card: React.FC<CardProps> = ({
   id,
   images,
   title,
@@ -79,82 +79,41 @@ const Card: FC<CardProps> = ({
   );
 };
 
-export const EstateList: FC = () => {
+export const EstateList: React.FC = () => {
   const { t } = useTranslation();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [type, setType] = useState<string>(searchParams.get("type") ?? "");
-  const [rooms, setRooms] = useState<string>(searchParams.get("rooms") ?? "");
+  const [type, setType] = useFilter("type");
+  const [rooms, setRooms] = useFilter("rooms");
+  const [priceFrom, setPriceFrom] = useFilter("priceFrom");
+  const [priceTo, setPriceTo] = useFilter("priceTo");
   const priceInitial = {
-    from: searchParams.get("priceFrom") ?? "",
-    to: searchParams.get("priceTo") ?? "",
+    from: priceFrom,
+    to: priceTo,
   };
-  const [price, setPrice] = useState<{
-    from: string;
-    to: string;
-  }>(priceInitial);
 
   const { data, isLoading, isSuccess } = useEstateList({
     type,
     rooms,
-    priceFrom: price.from,
-    priceTo: price.to,
+    priceFrom: priceFrom,
+    priceTo: priceTo,
   });
 
   const handleTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
-    if (!value) {
-      setType("");
-      setSearchParams((prev) => {
-        const next = new URLSearchParams(prev);
-        next.delete("type");
-        return next;
-      });
-      return;
-    }
     setType(value);
-    setSearchParams((prev) => {
-      const next = new URLSearchParams(prev);
-      next.set("type", value);
-      return next;
-    });
   };
 
   const handleRoomsChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
-    if (!value) {
-      setRooms("");
-      setSearchParams((prev) => {
-        const next = new URLSearchParams(prev);
-        next.delete("rooms");
-        return next;
-      });
-      return;
-    }
     setRooms(value);
-    setSearchParams((prev) => {
-      const next = new URLSearchParams(prev);
-      next.set("rooms", value);
-      return next;
-    });
   };
 
-  const handlePriceSubmit = (price: typeof priceInitial) => {
-    setPrice(price);
-    setSearchParams((prev) => {
-      const next = new URLSearchParams(prev);
-      if (price.from === "") {
-        next.delete("priceFrom");
-      } else {
-        next.set("priceFrom", price.from);
-      }
-      if (price.to === "") {
-        next.delete("priceTo");
-      } else {
-        next.set("priceTo", price.to);
-      }
-      return next;
-    });
-    return;
+  const handlePriceSubmit = ({ from, to }: typeof priceInitial) => {
+    const formattedPrice = {
+      from: String(from),
+      to: String(to),
+    };
+    setPriceFrom(formattedPrice.from);
+    setPriceTo(formattedPrice.to);
   };
 
   return (
