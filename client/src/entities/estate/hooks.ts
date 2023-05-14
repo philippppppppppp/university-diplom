@@ -8,7 +8,7 @@ export interface EstateItem {
   id: string;
   title: string;
   description?: string;
-  images: string[];
+  images?: string[];
   address: string;
   priceUAH: number;
   createdAt: string;
@@ -16,6 +16,18 @@ export interface EstateItem {
   livingAreaM2: number;
   kitchenAreaM2: number;
   type: EstateType;
+}
+
+export interface CreateEstate {
+  title: string;
+  description?: string;
+  images?: string[];
+  address: string;
+  priceUAH: string;
+  rooms: string;
+  livingAreaM2: string;
+  kitchenAreaM2: string;
+  type: EstateType | "";
 }
 
 export type EstateRooms = 1 | 2 | 3 | 4;

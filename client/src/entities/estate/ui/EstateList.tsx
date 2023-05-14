@@ -108,6 +108,7 @@ export const EstateList: React.FC = () => {
   };
 
   const handlePriceSubmit = ({ from, to }: typeof priceInitial) => {
+    console.log(from, typeof from);
     const formattedPrice = {
       from: String(from),
       to: String(to),

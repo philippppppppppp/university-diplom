@@ -9,7 +9,7 @@ import { LoginPage } from "./login-page";
 import { RegisterPage } from "./register-page";
 import { ActivationPage } from "./activation-page";
 import { EstateListPage } from "./estate-list";
-import { SellPage } from "./sell";
+import { CreateEstatePage } from "./create-estate";
 import { EstateItemPage } from "./estate-item";
 
 export const Routes: React.FC = () => {
@@ -35,7 +35,7 @@ export const Routes: React.FC = () => {
     },
     {
       path: "/estate/new",
-      element: authenticated ? <SellPage /> : <Navigate to="/register" />,
+      element: <CreateEstatePage />,
     },
     {
       path: "/estate/:id",

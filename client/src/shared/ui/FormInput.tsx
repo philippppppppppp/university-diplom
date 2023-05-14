@@ -1,5 +1,6 @@
 import { Input } from "@chakra-ui/react";
-import { Field } from "formik";
+import { useFormikContext } from "formik";
+import { ChangeEvent } from "react";
 
 interface Props {
   placeholder: string;
@@ -9,6 +10,13 @@ interface Props {
   autoComplete?: string;
 }
 
-export const FormInput: React.FC<Props> = (props) => (
-  <Input as={Field} {...props} />
-);
+export const FormInput: React.FC<Props> = (props) => {
+  const { values, setFieldValue } = useFormikContext<any>();
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setFieldValue(props.name, value);
+  };
+  return (
+    <Input value={values[props.name]} onChange={handleChange} {...props} />
+  );
+};

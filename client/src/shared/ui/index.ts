@@ -5,3 +5,5 @@ export { MinimalHeader } from "./MinimalHeader";
 export { MinimalLayout } from "./MinimalLayout";
 export { Gallery } from "./Gallery";
 export { FormPhoneInput } from "./FormPhoneInput";
+export { FormSelect } from "./FormSelect";
+export { FormTextArea } from "./FormTextArea";
