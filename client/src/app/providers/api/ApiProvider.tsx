@@ -1,5 +1,6 @@
 import { PropsWithChildren, FC, useRef, useMemo } from "react";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import axios, { AxiosRequestConfig } from "axios";
 import { tokenService, useAuth } from "../../../shared/auth";
 import {
@@ -99,7 +100,9 @@ export const ApiProvider: FC<PropsWithChildren> = ({ children }) => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ApiProviderLib client={apiClient}>{children}</ApiProviderLib>
+      <ApiProviderLib client={apiClient}>
+        <ReactQueryDevtools /> {children}
+      </ApiProviderLib>
     </QueryClientProvider>
   );
 };

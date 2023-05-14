@@ -1,7 +1,7 @@
 import { Box, Button, Flex } from "@chakra-ui/react";
 import { Form, Formik } from "formik";
 import { FormInput, FormSelect, FormTextArea } from "../../../shared/ui";
-import { CreateEstate } from "../hooks";
+import { CreateEstate, useCreateEstate } from "../hooks";
 import { useTranslation } from "../../../shared/translations";
 
 const initialValues: CreateEstate = {
@@ -17,9 +17,14 @@ const initialValues: CreateEstate = {
 
 export const EstateForm: React.FC = () => {
   const { t } = useTranslation();
+  const { mutate } = useCreateEstate();
 
   const handleSubmit = async (values: CreateEstate) => {
-    console.log(values);
+    mutate(values, {
+      onSuccess(data) {
+        console.log(data);
+      },
+    });
   };
 
   return (

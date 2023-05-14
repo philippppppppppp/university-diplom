@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { gql } from "graphql-request";
 import { useApi } from "../../shared/api";
 
@@ -132,6 +132,64 @@ export const useEstate = (id?: string) => {
     },
     {
       enabled: !!id,
+    }
+  );
+};
+
+const createEstateQuery = gql`
+  mutation (
+    $address: String
+    $description: String
+    $type: String
+    $title: String
+    $rooms: numeric
+    $priceUAH: numeric
+    $livingAreaM2: numeric
+    $kitchenAreaM2: numeric
+    $images: _text
+  ) {
+    insert_estate_one(
+      object: {
+        address: $address
+        description: $description
+        type: $type
+        title: $title
+        rooms: $rooms
+        priceUAH: $priceUAH
+        livingAreaM2: $livingAreaM2
+        kitchenAreaM2: $kitchenAreaM2
+        images: $images
+      }
+    ) {
+      type
+      title
+      rooms
+      priceUAH
+      livingAreaM2
+      kitchenAreaM2
+      images
+      description
+      id
+      createdAt
+      address
+    }
+  }
+`;
+
+export const useCreateEstate = () => {
+  const { request } = useApi();
+  const client = useQueryClient();
+  return useMutation(
+    async (values: CreateEstate) => {
+      const { insert_estate_one } = await request<{
+        insert_estate_one: EstateItem;
+      }>({ query: createEstateQuery, variables: values, role: "user" });
+      return insert_estate_one;
+    },
+    {
+      onSuccess() {
+        client.invalidateQueries(["estate-list"]);
+      },
     }
   );
 };

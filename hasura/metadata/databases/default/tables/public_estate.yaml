@@ -5,6 +5,23 @@ object_relationships:
   - name: author
     using:
       foreign_key_constraint_on: author_id
+insert_permissions:
+  - role: user
+    permission:
+      check: {}
+      set:
+        author_id: x-hasura-User-Id
+      columns:
+        - address
+        - description
+        - images
+        - kitchenAreaM2
+        - livingAreaM2
+        - priceUAH
+        - rooms
+        - title
+        - type
+      backend_only: false
 select_permissions:
   - role: anonymous
     permission:
