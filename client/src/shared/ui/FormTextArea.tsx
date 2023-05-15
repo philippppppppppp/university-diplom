@@ -9,13 +9,14 @@ interface Props {
 }
 
 export const FormTextArea: React.FC<Props> = (props) => {
-  const { values, setFieldValue } = useFormikContext<any>();
+  const { values, setFieldValue, isSubmitting } = useFormikContext<any>();
   return (
     <Textarea
       resize="none"
       rows={5}
       value={values[props.name]}
       onChange={(e) => setFieldValue(props.name, e.target.value)}
+      disabled={isSubmitting}
       {...props}
     />
   );

@@ -20,8 +20,8 @@ import {
 import { useEstateList, EstateItem } from "../hooks";
 import { Link } from "react-router-dom";
 import { useTranslation } from "../../../shared/translations";
-import { Formik, Form } from "formik";
-import { FormInput } from "../../../shared/ui";
+import { Formik, Form, FormikHelpers } from "formik";
+import { FormInput, FormSubmit } from "../../../shared/ui";
 import { getPriceString } from "../../../shared/getPriceString";
 import { getDateString } from "../../../shared/getDateString";
 import { useFilter } from "../../../shared/filtersService";
@@ -79,13 +79,18 @@ const Card: React.FC<CardProps> = ({
   );
 };
 
+interface PriceFilter {
+  from: string;
+  to: string;
+}
+
 export const EstateList: React.FC = () => {
   const { t } = useTranslation();
   const [type, setType] = useFilter("type");
   const [rooms, setRooms] = useFilter("rooms");
   const [priceFrom, setPriceFrom] = useFilter("priceFrom");
   const [priceTo, setPriceTo] = useFilter("priceTo");
-  const priceInitial = {
+  const priceInitial: PriceFilter = {
     from: priceFrom,
     to: priceTo,
   };
@@ -107,14 +112,17 @@ export const EstateList: React.FC = () => {
     setRooms(value);
   };
 
-  const handlePriceSubmit = ({ from, to }: typeof priceInitial) => {
-    console.log(from, typeof from);
+  const handlePriceFilterChange = (
+    { from, to }: PriceFilter,
+    { setSubmitting }: FormikHelpers<PriceFilter>
+  ) => {
     const formattedPrice = {
       from: String(from),
       to: String(to),
     };
     setPriceFrom(formattedPrice.from);
     setPriceTo(formattedPrice.to);
+    setSubmitting(false);
   };
 
   return (
@@ -147,7 +155,10 @@ export const EstateList: React.FC = () => {
           <PopoverContent>
             <PopoverArrow />
             <PopoverBody>
-              <Formik initialValues={priceInitial} onSubmit={handlePriceSubmit}>
+              <Formik
+                initialValues={priceInitial}
+                onSubmit={handlePriceFilterChange}
+              >
                 <Form>
                   <Flex direction="column" gap="2">
                     <FormInput
@@ -156,7 +167,7 @@ export const EstateList: React.FC = () => {
                       name="from"
                     />
                     <FormInput placeholder={t("to")} type="number" name="to" />
-                    <Button type="submit">{t("apply")}</Button>
+                    <FormSubmit>{t("apply")}</FormSubmit>
                   </Flex>
                 </Form>
               </Formik>

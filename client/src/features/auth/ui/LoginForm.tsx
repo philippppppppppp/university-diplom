@@ -1,9 +1,9 @@
-import { Button, Flex } from "@chakra-ui/react";
+import { Flex } from "@chakra-ui/react";
 import { useTranslation } from "../../../shared/translations";
 import { Formik, Form, FormikHelpers } from "formik";
 import { useAuth, Credentials } from "../../../shared/auth";
 import { object, string } from "yup";
-import { FormInput, FormPasswordInput } from "../../../shared/ui";
+import { FormInput, FormPasswordInput, FormSubmit } from "../../../shared/ui";
 import { FormError } from "../../../shared/ui/FormError";
 
 const initialValues: Credentials = {
@@ -37,15 +37,16 @@ interface Props {
 }
 
 export const LoginForm: React.FC<Props> = ({ onSubmit, onLoginSuccess }) => {
-  const { login, loading } = useAuth();
+  const { login } = useAuth();
   const { t } = useTranslation();
 
   const handleSubmit = async (
     credentials: Credentials,
-    { setErrors }: FormikHelpers<Credentials>
+    { setErrors, setSubmitting }: FormikHelpers<Credentials>
   ) => {
     try {
       await login(credentials);
+      setSubmitting(false);
       onLoginSuccess && onLoginSuccess();
     } catch (err: any) {
       setErrors({
@@ -69,20 +70,16 @@ export const LoginForm: React.FC<Props> = ({ onSubmit, onLoginSuccess }) => {
             placeholder={t("email")}
             type="email"
             name="email"
-            disabled={loading}
             autoComplete="email"
           />
           <FormPasswordInput
             placeholder={t("password")}
             name="password"
-            disabled={loading}
             abilityToShow
             autoComplete="password"
           />
           <FormError />
-          <Button type="submit" isLoading={loading}>
-            {t("login")}
-          </Button>
+          <FormSubmit>{t("login")}</FormSubmit>
         </Flex>
       </Form>
     </Formik>

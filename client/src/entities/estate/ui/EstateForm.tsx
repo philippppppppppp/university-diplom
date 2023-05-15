@@ -1,6 +1,11 @@
-import { Box, Button, Flex } from "@chakra-ui/react";
+import { Box, Flex } from "@chakra-ui/react";
 import { Form, Formik } from "formik";
-import { FormInput, FormSelect, FormTextArea } from "../../../shared/ui";
+import {
+  FormInput,
+  FormSelect,
+  FormSubmit,
+  FormTextArea,
+} from "../../../shared/ui";
 import { CreateEstate, useCreateEstate } from "../hooks";
 import { useTranslation } from "../../../shared/translations";
 
@@ -75,9 +80,9 @@ export const EstateForm: React.FC = () => {
             </Box>
           </Flex>
           <FormTextArea name="description" placeholder={t("description")} />
-          <Button type="submit" alignSelf="flex-start" w="150px">
-            {t("save")}
-          </Button>
+          <Box alignSelf="flex-start" w="150px">
+            <FormSubmit>{t("save")}</FormSubmit>
+          </Box>
         </Flex>
       </Form>
     </Formik>

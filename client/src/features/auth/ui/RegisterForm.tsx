@@ -1,4 +1,4 @@
-import { Button, Flex } from "@chakra-ui/react";
+import { Flex } from "@chakra-ui/react";
 import { useTranslation } from "../../../shared/translations";
 import { Formik, Form, FormikHelpers } from "formik";
 import { useAuth, RegisterData } from "../../../shared/auth";
@@ -7,6 +7,7 @@ import {
   FormInput,
   FormPasswordInput,
   FormPhoneInput,
+  FormSubmit,
 } from "../../../shared/ui";
 import { FormError } from "../../../shared/ui/FormError";
 
@@ -70,15 +71,16 @@ export const RegisterForm: React.FC<Props> = ({
   onSubmit,
   onRegisterSuccess,
 }) => {
-  const { loading, register } = useAuth();
+  const { register } = useAuth();
   const { t } = useTranslation();
 
   const handleSubmit = async (
     { confirmPassword, ...registerValues }: RegisterValues,
-    { setErrors }: FormikHelpers<RegisterValues>
+    { setErrors, setSubmitting }: FormikHelpers<RegisterValues>
   ) => {
     try {
       await register(registerValues);
+      setSubmitting(false);
       onRegisterSuccess && onRegisterSuccess();
     } catch (err: any) {
       setErrors({
@@ -101,33 +103,23 @@ export const RegisterForm: React.FC<Props> = ({
             placeholder={t("email")}
             type="email"
             name="email"
-            disabled={loading}
             autoComplete="email"
           />
-          <FormInput
-            placeholder={t("name")}
-            name="name"
-            disabled={loading}
-            autoComplete="name"
-          />
-          <FormPhoneInput autoComplete="phone" disabled={loading} />
+          <FormInput placeholder={t("name")} name="name" autoComplete="name" />
+          <FormPhoneInput autoComplete="phone" />
           <FormPasswordInput
             placeholder={t("password")}
             name="password"
-            disabled={loading}
             abilityToShow
             autoComplete="new-password"
           />
           <FormPasswordInput
             placeholder={t("confirmPassword")}
             name="confirmPassword"
-            disabled={loading}
             autoComplete="new-password"
           />
           <FormError />
-          <Button type="submit" isLoading={loading}>
-            {t("register")}
-          </Button>
+          <FormSubmit>{t("register")}</FormSubmit>
         </Flex>
       </Form>
     </Formik>

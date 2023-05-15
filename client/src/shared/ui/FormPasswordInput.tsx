@@ -6,14 +6,13 @@ import {
   InputRightElement,
 } from "@chakra-ui/react";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
-import { Field } from "formik";
+import { Field, useFormikContext } from "formik";
 
 interface Props {
   onClick?: () => void;
   abilityToShow?: boolean;
   placeholder: string;
   name: string;
-  disabled?: boolean;
   autoComplete?: string;
 }
 
@@ -24,6 +23,7 @@ export const FormPasswordInput: FC<Props> = ({
 }) => {
   const [showPassword, setShowPassword] = useState(false);
   const switchShowPassword = () => setShowPassword((v) => !v);
+  const { isSubmitting } = useFormikContext();
 
   if (abilityToShow) {
     return (
@@ -31,6 +31,7 @@ export const FormPasswordInput: FC<Props> = ({
         <Input
           type={showPassword ? "text" : "password"}
           as={Field}
+          disabled={isSubmitting}
           {...props}
         />
         <InputRightElement>

@@ -146,10 +146,12 @@ export const AuthProvider: FC<PropsWithChildren<Props>> = ({
 
   useEffect(() => {
     const initiallyRefresh = async () => {
-      if (!refreshRequestRef.current) {
-        refreshRequestRef.current = refresh();
-      }
-      await refreshRequestRef.current;
+      try {
+        if (!refreshRequestRef.current) {
+          refreshRequestRef.current = refresh();
+        }
+        await refreshRequestRef.current;
+      } catch {}
     };
     initiallyRefresh();
   }, [refresh]);
