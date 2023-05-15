@@ -8,3 +8,4 @@ export { FormPhoneInput } from "./FormPhoneInput";
 export { FormSelect } from "./FormSelect";
 export { FormTextArea } from "./FormTextArea";
 export { FormSubmit } from "./FormSubmit";
+export { FormImageSelect } from "./FormImageSelect";

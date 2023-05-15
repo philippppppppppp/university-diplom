@@ -1,6 +1,7 @@
 import { Box, Flex } from "@chakra-ui/react";
-import { Form, Formik } from "formik";
+import { Form, Formik, FormikHelpers } from "formik";
 import {
+  FormImageSelect,
   FormInput,
   FormSelect,
   FormSubmit,
@@ -8,6 +9,9 @@ import {
 } from "../../../shared/ui";
 import { CreateEstate, useCreateEstate } from "../hooks";
 import { useTranslation } from "../../../shared/translations";
+import { array, object, string } from "yup";
+import { FormError } from "../../../shared/ui/FormError";
+import { useNavigate } from "react-router-dom";
 
 const initialValues: CreateEstate = {
   type: "",
@@ -18,22 +22,44 @@ const initialValues: CreateEstate = {
   livingAreaM2: "",
   kitchenAreaM2: "",
   description: "",
+  images: [],
 };
+
+const validationSchema = object({
+  type: string().required("createEstateRequiredFields"),
+  title: string().required("createEstateRequiredFields"),
+  address: string().required("createEstateRequiredFields"),
+  priceUAH: string().required("createEstateRequiredFields"),
+  rooms: string().required("createEstateRequiredFields"),
+  livingAreaM2: string().required("createEstateRequiredFields"),
+  kitchenAreaM2: string().required("createEstateRequiredFields"),
+  description: string(),
+  images: array().of(string()),
+});
 
 export const EstateForm: React.FC = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { mutate } = useCreateEstate();
 
-  const handleSubmit = async (values: CreateEstate) => {
+  const handleSubmit = (
+    values: CreateEstate,
+    { setSubmitting }: FormikHelpers<CreateEstate>
+  ) => {
     mutate(values, {
-      onSuccess(data) {
-        console.log(data);
+      onSuccess({ id }) {
+        setSubmitting(false);
+        navigate(`/estate/${id}`);
       },
     });
   };
 
   return (
-    <Formik initialValues={initialValues} onSubmit={handleSubmit}>
+    <Formik
+      initialValues={initialValues}
+      onSubmit={handleSubmit}
+      validationSchema={validationSchema}
+    >
       <Form>
         <Flex gap="4" direction="column">
           <Box maxW="200px" w="100%">
@@ -80,6 +106,8 @@ export const EstateForm: React.FC = () => {
             </Box>
           </Flex>
           <FormTextArea name="description" placeholder={t("description")} />
+          <FormImageSelect name="images" />
+          <FormError />
           <Box alignSelf="flex-start" w="150px">
             <FormSubmit>{t("save")}</FormSubmit>
           </Box>

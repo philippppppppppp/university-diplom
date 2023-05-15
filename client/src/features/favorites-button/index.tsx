@@ -6,6 +6,7 @@ import { gql } from "graphql-request";
 import { useAuth } from "../../shared/auth";
 import { useTranslation } from "../../shared/translations";
 import { useViewer } from "../../entities/viewer";
+import { toApiArray } from "../../shared/toApiArray";
 
 const query = gql`
   mutation ($userId: uuid!, $favorites: _uuid) {
@@ -28,7 +29,7 @@ const useUpdateFavorites = () => {
         query,
         variables: {
           userId,
-          favorites: `{${favorites.join(", ")}}`,
+          favorites: toApiArray(favorites),
         },
         role: "user",
       });

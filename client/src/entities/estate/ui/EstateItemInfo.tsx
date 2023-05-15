@@ -28,7 +28,7 @@ export const EstateItemInfo: React.FC<Props> = ({
   const { t } = useTranslation();
   return (
     <Flex gap="8" direction="column">
-      {!!images?.length && (
+      {!!images.length && (
         <Flex
           direction={{ base: "column", md: "row" }}
           justifyContent="space-between"

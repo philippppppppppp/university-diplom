@@ -1,14 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { gql } from "graphql-request";
 import { useApi } from "../../shared/api";
+import { toApiArray } from "../../shared/toApiArray";
 
 export type EstateType = "house" | "flat";
 
 export interface EstateItem {
   id: string;
   title: string;
-  description?: string;
-  images?: string[];
+  description: string;
+  images: string[];
   address: string;
   priceUAH: number;
   createdAt: string;
@@ -20,8 +21,8 @@ export interface EstateItem {
 
 export interface CreateEstate {
   title: string;
-  description?: string;
-  images?: string[];
+  description: string;
+  images: string[];
   address: string;
   priceUAH: string;
   rooms: string;
@@ -161,17 +162,7 @@ const createEstateQuery = gql`
         images: $images
       }
     ) {
-      type
-      title
-      rooms
-      priceUAH
-      livingAreaM2
-      kitchenAreaM2
-      images
-      description
       id
-      createdAt
-      address
     }
   }
 `;
@@ -180,10 +171,17 @@ export const useCreateEstate = () => {
   const { request } = useApi();
   const client = useQueryClient();
   return useMutation(
-    async (values: CreateEstate) => {
+    async ({ images, ...values }: CreateEstate) => {
       const { insert_estate_one } = await request<{
-        insert_estate_one: EstateItem;
-      }>({ query: createEstateQuery, variables: values, role: "user" });
+        insert_estate_one: { id: string };
+      }>({
+        query: createEstateQuery,
+        variables: {
+          ...values,
+          images: toApiArray(images),
+        },
+        role: "user",
+      });
       return insert_estate_one;
     },
     {
