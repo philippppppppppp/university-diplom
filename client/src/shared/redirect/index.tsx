@@ -1,5 +1,11 @@
 import { forwardRef } from "@chakra-ui/react";
-import { useLocation, useNavigate, Link, LinkProps } from "react-router-dom";
+import {
+  useLocation,
+  useNavigate,
+  Link,
+  LinkProps,
+  Navigate,
+} from "react-router-dom";
 
 const redirectKey = "from";
 
@@ -15,9 +21,9 @@ export const useRedirect = () => {
   return redirect;
 };
 
-type Props = Omit<LinkProps, "state"> & { forward?: boolean };
+type RedirectLinkProps = Omit<LinkProps, "state"> & { forward?: boolean };
 
-export const RedirectLink: React.FC<Props> = forwardRef(
+export const RedirectLink: React.FC<RedirectLinkProps> = forwardRef(
   ({ forward, ...props }, ref) => {
     const { pathname, state } = useLocation();
     const redirectToForward = state?.[redirectKey];
@@ -30,3 +36,14 @@ export const RedirectLink: React.FC<Props> = forwardRef(
     );
   }
 );
+
+interface NavigateWithRedirectProps {
+  to: string;
+}
+
+export const NavigateWithRedirect: React.FC<NavigateWithRedirectProps> = ({
+  to,
+}) => {
+  const { pathname } = useLocation();
+  return <Navigate to={to} state={{ [redirectKey]: pathname }} />;
+};

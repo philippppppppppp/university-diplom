@@ -9,6 +9,7 @@ import {
   useRef,
 } from "react";
 import { getIdFromJwt } from "../getIdFromJwt";
+import { NavigateWithRedirect } from "../redirect";
 
 export type AuthToken = string;
 
@@ -175,3 +176,16 @@ export const AuthProvider: FC<PropsWithChildren<Props>> = ({
 };
 
 export const useAuth = () => useContext(context);
+
+export const PrivateRoute: FC<PropsWithChildren> = ({ children }) => {
+  const { loading, authenticated } = useAuth();
+  if (loading) {
+    return null;
+  }
+
+  if (authenticated) {
+    return <>{children}</>;
+  }
+
+  return <NavigateWithRedirect to="/login" />;
+};

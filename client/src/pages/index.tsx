@@ -3,7 +3,7 @@ import {
   Navigate,
   RouterProvider,
 } from "react-router-dom";
-import { useAuth } from "../shared/auth";
+import { PrivateRoute, useAuth } from "../shared/auth";
 import { HomePage } from "./home-page";
 import { LoginPage } from "./login-page";
 import { RegisterPage } from "./register-page";
@@ -35,7 +35,11 @@ export const Routes: React.FC = () => {
     },
     {
       path: "/estate/new",
-      element: <CreateEstatePage />,
+      element: (
+        <PrivateRoute>
+          <CreateEstatePage />
+        </PrivateRoute>
+      ),
     },
     {
       path: "/estate/:id",
