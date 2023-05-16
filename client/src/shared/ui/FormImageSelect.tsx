@@ -7,7 +7,7 @@ interface Props {
 }
 
 export const FormImageSelect: FC<Props> = ({ name }) => {
-  const { setFieldValue, isSubmitting } = useFormikContext<any>();
+  const { setFieldValue, isSubmitting, values } = useFormikContext<any>();
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFieldValue(
@@ -21,6 +21,7 @@ export const FormImageSelect: FC<Props> = ({ name }) => {
       name={name}
       onChange={handleChange}
       disabled={isSubmitting}
+      value={values[name].join(", ")}
       placeholder="temporary image select field"
     />
   );

@@ -1,29 +1,16 @@
 import { Box, Flex } from "@chakra-ui/react";
-import { Form, Formik, FormikHelpers } from "formik";
+import { Form as FormikForm, Formik, FormikHelpers } from "formik";
 import {
   FormImageSelect,
   FormInput,
   FormSelect,
   FormSubmit,
   FormTextArea,
-} from "../../../shared/ui";
-import { CreateEstate, useCreateEstate } from "../hooks";
-import { useTranslation } from "../../../shared/translations";
+} from "../../../../shared/ui";
+import { EstateFormValues } from "../../hooks";
+import { useTranslation } from "../../../../shared/translations";
 import { array, object, string } from "yup";
-import { FormError } from "../../../shared/ui/FormError";
-import { useNavigate } from "react-router-dom";
-
-const initialValues: CreateEstate = {
-  type: "",
-  title: "",
-  address: "",
-  priceUAH: "",
-  rooms: "",
-  livingAreaM2: "",
-  kitchenAreaM2: "",
-  description: "",
-  images: [],
-};
+import { FormError } from "../../../../shared/ui/FormError";
 
 const validationSchema = object({
   type: string().required("createEstateRequiredFields"),
@@ -37,30 +24,37 @@ const validationSchema = object({
   images: array().of(string()),
 });
 
-export const EstateForm: React.FC = () => {
-  const { t } = useTranslation();
-  const navigate = useNavigate();
-  const { mutate } = useCreateEstate();
+interface Props {
+  onSubmit(
+    values: EstateFormValues,
+    helpers: FormikHelpers<EstateFormValues>
+  ): void;
+  initialValues?: EstateFormValues;
+}
 
-  const handleSubmit = (
-    values: CreateEstate,
-    { setSubmitting }: FormikHelpers<CreateEstate>
-  ) => {
-    mutate(values, {
-      onSuccess({ id }) {
-        setSubmitting(false);
-        navigate(`/estate/${id}`);
-      },
-    });
-  };
+const defaultValues: EstateFormValues = {
+  type: "",
+  title: "",
+  address: "",
+  priceUAH: "",
+  rooms: "",
+  livingAreaM2: "",
+  kitchenAreaM2: "",
+  description: "",
+  images: [],
+};
+
+export const Form: React.FC<Props> = ({ onSubmit, initialValues }) => {
+  const { t } = useTranslation();
 
   return (
     <Formik
-      initialValues={initialValues}
-      onSubmit={handleSubmit}
+      enableReinitialize
+      initialValues={initialValues ?? defaultValues}
+      onSubmit={onSubmit}
       validationSchema={validationSchema}
     >
-      <Form>
+      <FormikForm>
         <Flex gap="4" direction="column">
           <Box maxW="200px" w="100%">
             <FormSelect name="type" placeholder={t("type")}>
@@ -112,7 +106,7 @@ export const EstateForm: React.FC = () => {
             <FormSubmit>{t("save")}</FormSubmit>
           </Box>
         </Flex>
-      </Form>
+      </FormikForm>
     </Formik>
   );
 };

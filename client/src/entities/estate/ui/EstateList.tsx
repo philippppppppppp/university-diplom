@@ -17,7 +17,7 @@ import {
   PopoverArrow,
   Tag,
 } from "@chakra-ui/react";
-import { useEstateList, EstateItem } from "../hooks";
+import { useEstateList, EstateListItem } from "../hooks";
 import { Link } from "react-router-dom";
 import { useTranslation } from "../../../shared/translations";
 import { Formik, Form, FormikHelpers } from "formik";
@@ -26,7 +26,7 @@ import { getPriceString } from "../../../shared/getPriceString";
 import { getDateString } from "../../../shared/getDateString";
 import { useFilter } from "../../../shared/filtersService";
 
-type CardProps = EstateItem;
+type CardProps = EstateListItem;
 
 const Card: React.FC<CardProps> = ({
   id,

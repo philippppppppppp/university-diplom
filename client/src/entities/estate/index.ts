@@ -1,2 +1,7 @@
 export { useEstateList } from "./hooks";
-export { EstateList, EstateItemInfo, EstateForm } from "./ui";
+export {
+  EstateList,
+  EstateItemInfo,
+  CreateEstateForm,
+  UpdateEstateForm,
+} from "./ui";

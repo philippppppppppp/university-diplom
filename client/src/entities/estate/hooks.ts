@@ -5,7 +5,7 @@ import { toApiArray } from "../../shared/toApiArray";
 
 export type EstateType = "house" | "flat";
 
-export interface EstateItem {
+export interface EstateItemInfo {
   id: string;
   title: string;
   description: string;
@@ -19,7 +19,18 @@ export interface EstateItem {
   type: EstateType;
 }
 
-export interface CreateEstate {
+export type EstateListItem = EstateItemInfo;
+
+export interface EstateItem extends EstateItemInfo {
+  author: {
+    id: string;
+    name: string;
+    phone: string;
+    lastOnline?: string;
+  };
+}
+
+export interface EstateFormValues {
   title: string;
   description: string;
   images: string[];
@@ -31,7 +42,27 @@ export interface CreateEstate {
   type: EstateType | "";
 }
 
-export type EstateRooms = 1 | 2 | 3 | 4;
+export const transformEstateItemInfoToFormValues = ({
+  priceUAH,
+  rooms,
+  livingAreaM2,
+  kitchenAreaM2,
+  title,
+  address,
+  description,
+  type,
+  images,
+}: EstateItemInfo): EstateFormValues => ({
+  title,
+  address,
+  description,
+  type,
+  images,
+  priceUAH: priceUAH.toString(),
+  rooms: rooms.toString(),
+  livingAreaM2: livingAreaM2.toString(),
+  kitchenAreaM2: kitchenAreaM2.toString(),
+});
 
 const estateListQuery = gql`
   query ($filters: estate_bool_exp) {
@@ -65,7 +96,7 @@ export const useEstateList = ({
   return useQuery(
     ["estate-list", type, rooms, priceFrom, priceTo],
     async () => {
-      const { estate } = await request<{ estate: EstateItem[] }>({
+      const { estate } = await request<{ estate: EstateListItem[] }>({
         query: estateListQuery,
         variables: {
           filters: {
@@ -84,13 +115,6 @@ export const useEstateList = ({
     }
   );
 };
-
-interface Author {
-  id: string;
-  name: string;
-  phone: string;
-  lastOnline?: string;
-}
 
 const estateQuery = gql`
   query ($id: uuid!) {
@@ -122,7 +146,7 @@ export const useEstate = (id?: string) => {
     ["estate-item", id],
     async () => {
       const { estate_by_pk } = await request<{
-        estate_by_pk: EstateItem & { author: Author };
+        estate_by_pk: EstateItem;
       }>({
         query: estateQuery,
         variables: {
@@ -171,7 +195,7 @@ export const useCreateEstate = () => {
   const { request } = useApi();
   const client = useQueryClient();
   return useMutation(
-    async ({ images, ...values }: CreateEstate) => {
+    async ({ images, ...values }: EstateFormValues) => {
       const { insert_estate_one } = await request<{
         insert_estate_one: { id: string };
       }>({
@@ -187,6 +211,64 @@ export const useCreateEstate = () => {
     {
       onSuccess() {
         client.invalidateQueries(["estate-list"]);
+      },
+    }
+  );
+};
+
+const updateEstateQuery = gql`
+  mutation (
+    $id: uuid!
+    $address: String
+    $description: String
+    $type: String
+    $title: String
+    $rooms: numeric
+    $priceUAH: numeric
+    $livingAreaM2: numeric
+    $kitchenAreaM2: numeric
+    $images: _text
+  ) {
+    update_estate_by_pk(
+      pk_columns: { id: $id }
+      _set: {
+        address: $address
+        description: $description
+        type: $type
+        title: $title
+        rooms: $rooms
+        priceUAH: $priceUAH
+        livingAreaM2: $livingAreaM2
+        kitchenAreaM2: $kitchenAreaM2
+        images: $images
+      }
+    ) {
+      id
+    }
+  }
+`;
+
+export const useUpdateEstate = () => {
+  const { request } = useApi();
+  const client = useQueryClient();
+  return useMutation(
+    async ({ images, ...values }: EstateFormValues & { id: string }) => {
+      const { update_estate_by_pk } = await request<{
+        update_estate_by_pk: { id: string };
+      }>({
+        query: updateEstateQuery,
+        variables: {
+          ...values,
+          images: toApiArray(images),
+        },
+        role: "user",
+      });
+      return update_estate_by_pk;
+    },
+    {
+      onSuccess({ id }) {
+        client.invalidateQueries(["estate-list"]);
+        client.invalidateQueries(["estate-item", id]);
       },
     }
   );

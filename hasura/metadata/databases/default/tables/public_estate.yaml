@@ -55,3 +55,20 @@ select_permissions:
         - title
         - type
       filter: {}
+update_permissions:
+  - role: user
+    permission:
+      columns:
+        - address
+        - description
+        - images
+        - kitchenAreaM2
+        - livingAreaM2
+        - priceUAH
+        - rooms
+        - title
+        - type
+      filter:
+        author_id:
+          _eq: X-Hasura-User-Id
+      check: null

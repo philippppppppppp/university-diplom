@@ -1,13 +1,12 @@
 import { Flex, Heading, Text, Badge, Tag, Box } from "@chakra-ui/react";
 import { Gallery } from "../../../shared/ui";
 import { useTranslation } from "../../../shared/translations";
-import { EstateItem } from "../hooks";
+import { EstateItemInfo as EstateItemInfoType } from "../hooks";
 import { getPriceString } from "../../../shared/getPriceString";
 import { getDateString } from "../../../shared/getDateString";
 
 interface Props {
-  details: EstateItem;
-  isAuthor: boolean;
+  details: EstateItemInfoType;
   action: JSX.Element | null;
 }
 

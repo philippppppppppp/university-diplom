@@ -10,7 +10,7 @@ export const EstateItemPage: React.FC = () => {
     <>
       <Header />
       <Layout>
-        <EstateItem id={id} />
+        <EstateItem id={id!} />
       </Layout>
     </>
   );
