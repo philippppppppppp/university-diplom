@@ -9,3 +9,5 @@ export { FormSelect } from "./FormSelect";
 export { FormTextArea } from "./FormTextArea";
 export { FormSubmit } from "./FormSubmit";
 export { FormImageSelect } from "./FormImageSelect";
+export { Loader } from "./Loader";
+export { LoadingError } from "./LoadingError";

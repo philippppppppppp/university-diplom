@@ -10,9 +10,14 @@ import { Form } from "./components/Form";
 interface Props {
   id: string;
   onSuccess?(): void;
+  onCancel?(): void;
 }
 
-export const UpdateEstateForm: React.FC<Props> = ({ id, onSuccess }) => {
+export const UpdateEstateForm: React.FC<Props> = ({
+  id,
+  onSuccess,
+  onCancel,
+}) => {
   const { data, isSuccess } = useEstate(id);
   const { mutate } = useUpdateEstate();
 
@@ -37,5 +42,7 @@ export const UpdateEstateForm: React.FC<Props> = ({ id, onSuccess }) => {
     );
   };
 
-  return <Form onSubmit={handleSubmit} initialValues={values} />;
+  return (
+    <Form onSubmit={handleSubmit} initialValues={values} onCancel={onCancel} />
+  );
 };

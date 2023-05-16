@@ -1,4 +1,4 @@
-import { Box, Flex } from "@chakra-ui/react";
+import { Box, Button, Flex } from "@chakra-ui/react";
 import { Form as FormikForm, Formik, FormikHelpers } from "formik";
 import {
   FormImageSelect,
@@ -29,6 +29,7 @@ interface Props {
     values: EstateFormValues,
     helpers: FormikHelpers<EstateFormValues>
   ): void;
+  onCancel?(): void;
   initialValues?: EstateFormValues;
 }
 
@@ -44,7 +45,11 @@ const defaultValues: EstateFormValues = {
   images: [],
 };
 
-export const Form: React.FC<Props> = ({ onSubmit, initialValues }) => {
+export const Form: React.FC<Props> = ({
+  onSubmit,
+  onCancel,
+  initialValues,
+}) => {
   const { t } = useTranslation();
 
   return (
@@ -102,9 +107,10 @@ export const Form: React.FC<Props> = ({ onSubmit, initialValues }) => {
           <FormTextArea name="description" placeholder={t("description")} />
           <FormImageSelect name="images" />
           <FormError />
-          <Box alignSelf="flex-start" w="150px">
+          <Flex gap="4">
             <FormSubmit>{t("save")}</FormSubmit>
-          </Box>
+            {onCancel && <Button onClick={onCancel}>{t("cancel")}</Button>}
+          </Flex>
         </Flex>
       </FormikForm>
     </Formik>

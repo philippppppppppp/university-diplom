@@ -8,7 +8,6 @@ import {
   Image,
   CardFooter,
   Select,
-  Spinner,
   Popover,
   PopoverTrigger,
   Button,
@@ -21,7 +20,12 @@ import { useEstateList, EstateListItem } from "../hooks";
 import { Link } from "react-router-dom";
 import { useTranslation } from "../../../shared/translations";
 import { Formik, Form, FormikHelpers } from "formik";
-import { FormInput, FormSubmit } from "../../../shared/ui";
+import {
+  FormInput,
+  FormSubmit,
+  Loader,
+  LoadingError,
+} from "../../../shared/ui";
 import { getPriceString } from "../../../shared/getPriceString";
 import { getDateString } from "../../../shared/getDateString";
 import { useFilter } from "../../../shared/filtersService";
@@ -95,12 +99,20 @@ export const EstateList: React.FC = () => {
     to: priceTo,
   };
 
-  const { data, isLoading, isSuccess } = useEstateList({
+  const { data, isLoading, isError } = useEstateList({
     type,
     rooms,
     priceFrom: priceFrom,
     priceTo: priceTo,
   });
+
+  if (isLoading) {
+    return <Loader />;
+  }
+
+  if (isError) {
+    return <LoadingError />;
+  }
 
   const handleTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
@@ -176,8 +188,7 @@ export const EstateList: React.FC = () => {
         </Popover>
       </Flex>
       <Flex gap="4" direction="column">
-        {isLoading && <Spinner alignSelf="center" />}
-        {isSuccess && data.length > 0 ? (
+        {data.length > 0 ? (
           data!.map((item) => <Card {...item} key={item.id} />)
         ) : (
           <Text alignSelf="center">{t("noResult")}</Text>

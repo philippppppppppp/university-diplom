@@ -7,19 +7,24 @@ import { useAuth } from "../../shared/auth";
 import { FavoritesButton } from "../../features/favorites-button";
 import { useTranslation } from "../../shared/translations";
 import { EditIcon } from "@chakra-ui/icons";
+import { Loader, LoadingError } from "../../shared/ui";
 
 interface Props {
   id: string;
 }
 
 export const EstateItem: FC<Props> = ({ id }) => {
-  const { data, isSuccess } = useEstate(id);
+  const { data, isLoading, isError } = useEstate(id);
   const { userId, authenticated } = useAuth();
   const { t } = useTranslation();
   const [editMode, setEditMode] = useState(false);
 
-  if (!isSuccess) {
-    return null;
+  if (isLoading) {
+    return <Loader />;
+  }
+
+  if (isError) {
+    return <LoadingError />;
   }
 
   const { author, ...details } = data;
@@ -38,10 +43,16 @@ export const EstateItem: FC<Props> = ({ id }) => {
     }
   }
 
+  const disableEditMode = () => setEditMode(false);
+
   return (
     <Flex direction="column" gap="8">
       {editMode ? (
-        <UpdateEstateForm id={id} onSuccess={() => setEditMode(false)} />
+        <UpdateEstateForm
+          id={id}
+          onSuccess={disableEditMode}
+          onCancel={disableEditMode}
+        />
       ) : (
         <>
           <EstateItemInfo details={details} action={action} />
