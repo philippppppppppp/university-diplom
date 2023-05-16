@@ -1,11 +1,5 @@
-import { Layout } from "../../shared/ui";
-import { Header } from "../../widgets/header";
+import { BasicLayout } from "../../widgets/basic-layout";
 
 export const HomePage: React.FC = () => {
-  return (
-    <>
-      <Header />
-      <Layout></Layout>
-    </>
-  );
+  return <BasicLayout></BasicLayout>;
 };

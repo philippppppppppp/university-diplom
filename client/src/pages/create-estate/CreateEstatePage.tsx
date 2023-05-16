@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { CreateEstateForm } from "../../entities/estate";
-import { Layout } from "../../shared/ui";
-import { Header } from "../../widgets/header";
+import { BasicLayout } from "../../widgets/basic-layout";
 
 export const CreateEstatePage: React.FC = () => {
   const navigate = useNavigate();
@@ -11,11 +10,8 @@ export const CreateEstatePage: React.FC = () => {
   };
 
   return (
-    <>
-      <Header />
-      <Layout>
-        <CreateEstateForm onSuccess={handleSuccess} />
-      </Layout>
-    </>
+    <BasicLayout>
+      <CreateEstateForm onSuccess={handleSuccess} />
+    </BasicLayout>
   );
 };

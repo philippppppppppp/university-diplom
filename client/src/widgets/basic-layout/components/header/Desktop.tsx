@@ -9,12 +9,11 @@ import {
   MenuList,
   useColorMode,
 } from "@chakra-ui/react";
-import { CheckCircleIcon } from "@chakra-ui/icons";
 import { Link } from "react-router-dom";
-import { useTranslation } from "../../../shared/translations";
-import { AuthButton } from "../../../features/auth";
-import { LanguageSelect } from "../../../features/select-language";
-import { ThemeSwitchButton } from "../../../features/switch-theme";
+import { useTranslation } from "../../../../shared/translations";
+import { AuthButton } from "../../../../features/auth";
+import { LanguageSelect } from "../../../../features/select-language";
+import { ThemeSwitchButton } from "../../../../features/switch-theme";
 
 export const Desktop: React.FC = () => {
   const { t } = useTranslation();
@@ -31,7 +30,9 @@ export const Desktop: React.FC = () => {
           alignItems="center"
           as="nav"
         >
-          <CheckCircleIcon boxSize="6" />
+          <Button as={Link} fontSize="20" to="/" variant="link">
+            {t("homePage")}
+          </Button>
           <Menu>
             <MenuButton as={Button} fontSize="20" variant="link">
               {t("buy")}

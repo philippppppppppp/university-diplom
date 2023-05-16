@@ -14,10 +14,10 @@ import {
 } from "@chakra-ui/react";
 import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
 import { Link } from "react-router-dom";
-import { useTranslation } from "../../../shared/translations";
-import { AuthButton } from "../../../features/auth";
-import { LanguageSelect } from "../../../features/select-language";
-import { ThemeSwitchButton } from "../../../features/switch-theme";
+import { useTranslation } from "../../../../shared/translations";
+import { AuthButton } from "../../../../features/auth";
+import { LanguageSelect } from "../../../../features/select-language";
+import { ThemeSwitchButton } from "../../../../features/switch-theme";
 
 export const Mobile: React.FC = () => {
   const { t } = useTranslation();
@@ -53,6 +53,12 @@ export const Mobile: React.FC = () => {
                   <AuthButton />
                 </Flex>
               </Container>
+              <Divider />
+              <DrawerBody as={Flex} direction="column" fontSize="18">
+                <LinkUi as={Link} to="/">
+                  {t("homePage")}
+                </LinkUi>
+              </DrawerBody>
               <Divider />
               <DrawerBody as={Flex} direction="column" fontSize="18">
                 <LinkUi as={Link} to="/estate">

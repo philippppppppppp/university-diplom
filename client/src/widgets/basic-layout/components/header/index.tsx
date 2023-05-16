@@ -1,6 +1,6 @@
 import { Show } from "@chakra-ui/react";
-import { Desktop } from "./components/Desktop";
-import { Mobile } from "./components/Mobile";
+import { Desktop } from "./Desktop";
+import { Mobile } from "./Mobile";
 
 export const Header: React.FC = () => {
   return (

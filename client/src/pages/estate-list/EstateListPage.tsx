@@ -1,14 +1,10 @@
 import { EstateList } from "../../entities/estate";
-import { Layout } from "../../shared/ui";
-import { Header } from "../../widgets/header";
+import { BasicLayout } from "../../widgets/basic-layout";
 
 export const EstateListPage: React.FC = () => {
   return (
-    <>
-      <Header />
-      <Layout>
-        <EstateList />
-      </Layout>
-    </>
+    <BasicLayout>
+      <EstateList />
+    </BasicLayout>
   );
 };
