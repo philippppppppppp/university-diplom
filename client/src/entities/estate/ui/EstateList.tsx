@@ -1,3 +1,4 @@
+import { ChangeEvent, FC, useEffect } from "react";
 import {
   Card as CardUi,
   CardBody,
@@ -15,6 +16,7 @@ import {
   PopoverBody,
   PopoverArrow,
   Tag,
+  Checkbox,
 } from "@chakra-ui/react";
 import { useEstateList, EstateListItem } from "../hooks";
 import { Link } from "react-router-dom";
@@ -28,11 +30,12 @@ import {
 } from "../../../shared/ui";
 import { getPriceString } from "../../../shared/getPriceString";
 import { getDateString } from "../../../shared/getDateString";
-import { useFilter } from "../../../shared/filtersService";
+import { useBooleanFilter, useFilter } from "../../../shared/filtersService";
+import { useAuth } from "../../../shared/auth";
 
 type CardProps = EstateListItem;
 
-const Card: React.FC<CardProps> = ({
+const Card: FC<CardProps> = ({
   id,
   images,
   title,
@@ -88,12 +91,14 @@ interface PriceFilter {
   to: string;
 }
 
-export const EstateList: React.FC = () => {
+export const EstateList: FC = () => {
   const { t } = useTranslation();
+  const { authenticated, loading, userId } = useAuth();
   const [type, setType] = useFilter("type");
   const [rooms, setRooms] = useFilter("rooms");
   const [priceFrom, setPriceFrom] = useFilter("priceFrom");
   const [priceTo, setPriceTo] = useFilter("priceTo");
+  const [userAdsOnly, setUserAdsOnly] = useBooleanFilter("userAdsOnly");
   const priceInitial: PriceFilter = {
     from: priceFrom,
     to: priceTo,
@@ -104,7 +109,14 @@ export const EstateList: React.FC = () => {
     rooms,
     priceFrom: priceFrom,
     priceTo: priceTo,
+    authorId: userAdsOnly ? userId : null,
   });
+
+  useEffect(() => {
+    if (!authenticated && !loading) {
+      setUserAdsOnly(false);
+    }
+  }, [setUserAdsOnly, authenticated, loading]);
 
   if (isLoading) {
     return <Loader />;
@@ -114,12 +126,12 @@ export const EstateList: React.FC = () => {
     return <LoadingError />;
   }
 
-  const handleTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleTypeChange = (e: ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
     setType(value);
   };
 
-  const handleRoomsChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleRoomsChange = (e: ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
     setRooms(value);
   };
@@ -135,6 +147,11 @@ export const EstateList: React.FC = () => {
     setPriceFrom(formattedPrice.from);
     setPriceTo(formattedPrice.to);
     setSubmitting(false);
+  };
+
+  const handleUserAdsOnlyFilterChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const checked = e.target.checked;
+    setUserAdsOnly(checked);
   };
 
   return (
@@ -186,6 +203,15 @@ export const EstateList: React.FC = () => {
             </PopoverBody>
           </PopoverContent>
         </Popover>
+        {authenticated && (
+          <Checkbox
+            onChange={handleUserAdsOnlyFilterChange}
+            checked={userAdsOnly}
+            defaultChecked={userAdsOnly}
+          >
+            {t("userAdsOnly")}
+          </Checkbox>
+        )}
       </Flex>
       <Flex gap="4" direction="column">
         {data.length > 0 ? (

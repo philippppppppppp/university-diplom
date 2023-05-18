@@ -86,20 +86,23 @@ export const useEstateList = ({
   rooms,
   priceFrom,
   priceTo,
+  authorId,
 }: {
   type?: string;
   rooms?: string;
   priceFrom?: string;
   priceTo?: string;
+  authorId?: string | null;
 }) => {
   const { request } = useApi();
   return useQuery(
-    ["estate-list", type, rooms, priceFrom, priceTo],
+    ["estate-list", type, rooms, priceFrom, priceTo, authorId],
     async () => {
       const { estate } = await request<{ estate: EstateListItem[] }>({
         query: estateListQuery,
         variables: {
           filters: {
+            //TODO: FIX THIS
             ...(!!type && { type: { _eq: type } }),
             ...(!!rooms && { rooms: { _eq: rooms } }),
             ...((!!priceFrom || !!priceTo) && {
@@ -108,6 +111,7 @@ export const useEstateList = ({
                 ...(!!priceTo && { _lte: priceTo }),
               },
             }),
+            ...(!!authorId && { author_id: { _eq: authorId } }),
           },
         },
       });

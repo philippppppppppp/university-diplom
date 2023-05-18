@@ -72,19 +72,16 @@ export const AuthProvider: FC<PropsWithChildren<Props>> = ({
   client,
 }) => {
   const [userId, setUserId] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const refreshRequestRef = useRef<null | ReturnType<Auth["refresh"]>>(null);
   const authenticated = !!userId;
 
   const register = useCallback(
     async (registerData: RegisterData) => {
       try {
-        setLoading(true);
         await client.register(registerData);
       } catch (err) {
         throw err;
-      } finally {
-        setLoading(false);
       }
     },
     [client]
@@ -93,12 +90,9 @@ export const AuthProvider: FC<PropsWithChildren<Props>> = ({
   const activate = useCallback(
     async (activationToken: ActivationToken) => {
       try {
-        setLoading(true);
         await client.activate(activationToken);
       } catch (err) {
         throw err;
-      } finally {
-        setLoading(false);
       }
     },
     [client]
@@ -107,14 +101,11 @@ export const AuthProvider: FC<PropsWithChildren<Props>> = ({
   const login = useCallback(
     async (credentials: Credentials) => {
       try {
-        setLoading(true);
         const token = await client.login(credentials);
         tokenService.set(token);
         setUserId(getIdFromJwt(token));
       } catch (err) {
         throw err;
-      } finally {
-        setLoading(false);
       }
     },
     [client]
@@ -122,27 +113,20 @@ export const AuthProvider: FC<PropsWithChildren<Props>> = ({
 
   const refresh = useCallback(async () => {
     try {
-      setLoading(true);
       const token = await client.refresh();
       tokenService.set(token);
       setUserId(getIdFromJwt(token));
     } catch (err) {
       throw err;
-    } finally {
-      setLoading(false);
     }
   }, [client]);
 
   const logout = useCallback(async () => {
     try {
-      setLoading(true);
       await client.logout();
       tokenService.clear();
       setUserId(null);
-    } catch (err) {
-    } finally {
-      setLoading(false);
-    }
+    } catch (err) {}
   }, [client]);
 
   useEffect(() => {
@@ -152,6 +136,7 @@ export const AuthProvider: FC<PropsWithChildren<Props>> = ({
           refreshRequestRef.current = refresh();
         }
         await refreshRequestRef.current;
+        setLoading(false);
       } catch {}
     };
     initiallyRefresh();
