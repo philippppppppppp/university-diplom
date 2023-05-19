@@ -30,7 +30,8 @@ interface Auth {
   login(credentials: Credentials): Promise<void>;
   refresh(): Promise<void>;
   logout(): Promise<void>;
-  loading: boolean;
+  loadingInitialRefresh: boolean;
+  notAuthenticatedAfterInitialRefresh: boolean;
 }
 
 const context = createContext({} as Auth);
@@ -72,9 +73,11 @@ export const AuthProvider: FC<PropsWithChildren<Props>> = ({
   client,
 }) => {
   const [userId, setUserId] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loadingInitialRefresh, setInitialRefreshLoading] = useState(true);
   const refreshRequestRef = useRef<null | ReturnType<Auth["refresh"]>>(null);
   const authenticated = !!userId;
+  const notAuthenticatedAfterInitialRefresh =
+    !authenticated && !loadingInitialRefresh;
 
   const register = useCallback(
     async (registerData: RegisterData) => {
@@ -136,7 +139,7 @@ export const AuthProvider: FC<PropsWithChildren<Props>> = ({
           refreshRequestRef.current = refresh();
         }
         await refreshRequestRef.current;
-        setLoading(false);
+        setInitialRefreshLoading(false);
       } catch {}
     };
     initiallyRefresh();
@@ -152,7 +155,8 @@ export const AuthProvider: FC<PropsWithChildren<Props>> = ({
         login,
         refresh,
         logout,
-        loading,
+        loadingInitialRefresh,
+        notAuthenticatedAfterInitialRefresh,
       }}
     >
       {children}
@@ -163,8 +167,8 @@ export const AuthProvider: FC<PropsWithChildren<Props>> = ({
 export const useAuth = () => useContext(context);
 
 export const PrivateRoute: FC<PropsWithChildren> = ({ children }) => {
-  const { loading, authenticated } = useAuth();
-  if (loading) {
+  const { loadingInitialRefresh, authenticated } = useAuth();
+  if (loadingInitialRefresh) {
     return null;
   }
 

@@ -1,13 +1,6 @@
 import { ChangeEvent, FC, Fragment, useEffect } from "react";
 import {
-  Card as CardUi,
-  CardBody,
   Flex,
-  Heading,
-  Stack,
-  Text,
-  Image,
-  CardFooter,
   Select,
   Popover,
   PopoverTrigger,
@@ -15,12 +8,10 @@ import {
   PopoverContent,
   PopoverBody,
   PopoverArrow,
-  Tag,
   Checkbox,
   Box,
 } from "@chakra-ui/react";
-import { EstateListItem, useEstateInfiniteList } from "../hooks";
-import { Link } from "react-router-dom";
+import { useEstateInfiniteList } from "../hooks";
 import { useTranslation } from "../../../shared/translations";
 import { Formik, Form, FormikHelpers } from "formik";
 import {
@@ -29,64 +20,10 @@ import {
   Loader,
   LoadingError,
 } from "../../../shared/ui";
-import { getPriceString } from "../../../shared/getPriceString";
-import { getDateString } from "../../../shared/getDateString";
 import { useBooleanFilter, useFilter } from "../../../shared/filtersService";
 import { useAuth } from "../../../shared/auth";
 import { useInView } from "react-intersection-observer";
-
-type CardProps = EstateListItem;
-
-const Card: FC<CardProps> = ({
-  id,
-  images,
-  title,
-  description,
-  address,
-  priceUAH,
-  createdAt,
-  livingAreaM2,
-  rooms,
-}) => {
-  const { t } = useTranslation();
-  return (
-    <CardUi
-      direction={{ md: "row", base: "column" }}
-      cursor="pointer"
-      as={Link}
-      to={`/estate/${id}`}
-      overflow="hidden"
-    >
-      <Image
-        maxW={{ md: "400px", base: "100%" }}
-        maxH={{ md: "auto", base: "350px" }}
-        objectFit="cover"
-        src={images?.[0]}
-      />
-      <Stack>
-        <CardBody>
-          <Text pb="1">{getPriceString(priceUAH)}</Text>
-          <Heading size="md">{title}</Heading>
-          <Text py="2">{address}</Text>
-          {!!description && <Text py="2">{description}</Text>}
-          <Flex py="2" gap="2">
-            <Tag>
-              {t("rooms")}: {rooms}
-            </Tag>
-            <Tag>
-              {t("totalArea")}: {livingAreaM2}м²
-            </Tag>
-          </Flex>
-        </CardBody>
-        <CardFooter>
-          <Text>
-            {t("published")}: {getDateString(createdAt)}
-          </Text>
-        </CardFooter>
-      </Stack>
-    </CardUi>
-  );
-};
+import { ListItem } from "./components/ListItem";
 
 interface PriceFilter {
   from: string;
@@ -96,16 +33,19 @@ interface PriceFilter {
 export const EstateList: FC = () => {
   const { ref, inView } = useInView();
   const { t } = useTranslation();
-  const { authenticated, loading, userId } = useAuth();
+  const { userId, authenticated, notAuthenticatedAfterInitialRefresh } =
+    useAuth();
+
   const [type, setType] = useFilter("type");
   const [rooms, setRooms] = useFilter("rooms");
   const [priceFrom, setPriceFrom] = useFilter("priceFrom");
   const [priceTo, setPriceTo] = useFilter("priceTo");
-  const [userAdsOnly, setUserAdsOnly] = useBooleanFilter("userAdsOnly");
   const priceInitial: PriceFilter = {
     from: priceFrom,
     to: priceTo,
   };
+  const [userAdsOnly, setUserAdsOnly] = useBooleanFilter("userAdsOnly");
+
   const {
     data: infiniteData,
     fetchNextPage,
@@ -127,10 +67,10 @@ export const EstateList: FC = () => {
   }, [inView, fetchNextPage]);
 
   useEffect(() => {
-    if (!authenticated && !loading) {
+    if (notAuthenticatedAfterInitialRefresh) {
       setUserAdsOnly(false);
     }
-  }, [setUserAdsOnly, authenticated, loading]);
+  }, [setUserAdsOnly, notAuthenticatedAfterInitialRefresh]);
 
   if (isLoading) {
     return <Loader />;
@@ -231,7 +171,7 @@ export const EstateList: FC = () => {
         {infiniteData?.pages.map(({ data, nextOffset }) => (
           <Fragment key={nextOffset}>
             {data.map((item) => (
-              <Card {...item} key={item.id} />
+              <ListItem {...item} key={item.id} />
             ))}
           </Fragment>
         ))}
