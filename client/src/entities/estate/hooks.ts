@@ -1,4 +1,9 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { gql } from "graphql-request";
 import { useApi } from "../../shared/api";
 import { toApiArray } from "../../shared/toApiArray";
@@ -118,6 +123,79 @@ export const useEstateList = ({
       return estate;
     }
   );
+};
+
+const estateInfiniteListQuery = gql`
+  query ($limit: Int, $offset: Int, $filters: estate_bool_exp) {
+    estate(limit: $limit, offset: $offset, where: $filters) {
+      id
+      title
+      images
+      address
+      priceUAH
+      createdAt
+      description
+      rooms
+      livingAreaM2
+      kitchenAreaM2
+    }
+  }
+`;
+
+const limit = 10;
+
+export const useEstateInfiniteList = ({
+  type,
+  rooms,
+  priceFrom,
+  priceTo,
+  authorId,
+}: {
+  type?: string;
+  rooms?: string;
+  priceFrom?: string;
+  priceTo?: string;
+  authorId?: string | null;
+}) => {
+  const { request } = useApi();
+  return useInfiniteQuery({
+    queryKey: [
+      "estate-list-infinite",
+      type,
+      rooms,
+      priceFrom,
+      priceTo,
+      authorId,
+    ],
+    async queryFn({ pageParam: nextOffset }) {
+      const offset = nextOffset ?? 0;
+      const { estate } = await request<{ estate: EstateListItem[] }>({
+        query: estateInfiniteListQuery,
+        variables: {
+          limit,
+          offset,
+          filters: {
+            ...(!!type && { type: { _eq: type } }),
+            ...(!!rooms && { rooms: { _eq: rooms } }),
+            ...((!!priceFrom || !!priceTo) && {
+              priceUAH: {
+                ...(!!priceFrom && { _gte: priceFrom }),
+                ...(!!priceTo && { _lte: priceTo }),
+              },
+            }),
+            ...(!!authorId && { author_id: { _eq: authorId } }),
+          },
+        },
+      });
+      return { data: estate, nextOffset: offset + limit };
+    },
+    getNextPageParam(lastPage) {
+      if (!lastPage.data.length) {
+        return;
+      }
+      return lastPage.nextOffset;
+    },
+  });
 };
 
 const estateQuery = gql`

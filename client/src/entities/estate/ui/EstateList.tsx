@@ -1,4 +1,4 @@
-import { ChangeEvent, FC, useEffect } from "react";
+import { ChangeEvent, FC, Fragment, useEffect } from "react";
 import {
   Card as CardUi,
   CardBody,
@@ -17,8 +17,9 @@ import {
   PopoverArrow,
   Tag,
   Checkbox,
+  Box,
 } from "@chakra-ui/react";
-import { useEstateList, EstateListItem } from "../hooks";
+import { EstateListItem, useEstateInfiniteList } from "../hooks";
 import { Link } from "react-router-dom";
 import { useTranslation } from "../../../shared/translations";
 import { Formik, Form, FormikHelpers } from "formik";
@@ -32,6 +33,7 @@ import { getPriceString } from "../../../shared/getPriceString";
 import { getDateString } from "../../../shared/getDateString";
 import { useBooleanFilter, useFilter } from "../../../shared/filtersService";
 import { useAuth } from "../../../shared/auth";
+import { useInView } from "react-intersection-observer";
 
 type CardProps = EstateListItem;
 
@@ -92,6 +94,7 @@ interface PriceFilter {
 }
 
 export const EstateList: FC = () => {
+  const { ref, inView } = useInView();
   const { t } = useTranslation();
   const { authenticated, loading, userId } = useAuth();
   const [type, setType] = useFilter("type");
@@ -103,14 +106,25 @@ export const EstateList: FC = () => {
     from: priceFrom,
     to: priceTo,
   };
-
-  const { data, isLoading, isError } = useEstateList({
+  const {
+    data: infiniteData,
+    fetchNextPage,
+    hasNextPage,
+    isLoading,
+    isError,
+  } = useEstateInfiniteList({
     type,
     rooms,
     priceFrom: priceFrom,
     priceTo: priceTo,
     authorId: userAdsOnly ? userId : null,
   });
+
+  useEffect(() => {
+    if (inView) {
+      fetchNextPage();
+    }
+  }, [inView, fetchNextPage]);
 
   useEffect(() => {
     if (!authenticated && !loading) {
@@ -214,10 +228,17 @@ export const EstateList: FC = () => {
         )}
       </Flex>
       <Flex gap="4" direction="column">
-        {data.length > 0 ? (
-          data!.map((item) => <Card {...item} key={item.id} />)
-        ) : (
-          <Text alignSelf="center">{t("noResult")}</Text>
+        {infiniteData?.pages.map(({ data, nextOffset }) => (
+          <Fragment key={nextOffset}>
+            {data.map((item) => (
+              <Card {...item} key={item.id} />
+            ))}
+          </Fragment>
+        ))}
+        {!isLoading && hasNextPage && (
+          <Box ref={ref}>
+            <Loader />
+          </Box>
         )}
       </Flex>
     </>
