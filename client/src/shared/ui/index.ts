@@ -10,3 +10,4 @@ export { FormSubmit } from "./FormSubmit";
 export { FormImageSelect } from "./FormImageSelect";
 export { Loader } from "./Loader";
 export { LoadingError } from "./LoadingError";
+export { Container } from "./Container";

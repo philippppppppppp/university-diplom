@@ -10,11 +10,15 @@ import {
   PopoverArrow,
   Checkbox,
   Box,
+  Slide,
+  useColorMode,
+  Show,
 } from "@chakra-ui/react";
 import { useEstateInfiniteList } from "../hooks";
 import { useTranslation } from "../../../shared/translations";
 import { Formik, Form, FormikHelpers } from "formik";
 import {
+  Container,
   FormInput,
   FormSubmit,
   Loader,
@@ -31,10 +35,12 @@ interface PriceFilter {
 }
 
 export const EstateList: FC = () => {
-  const { ref, inView } = useInView();
   const { t } = useTranslation();
   const { userId, authenticated, notAuthenticatedAfterInitialRefresh } =
     useAuth();
+  const { ref: loadMoreRef, inView: loadMoreInView } = useInView();
+  const { ref: filtersRef, inView: filtersInView } = useInView();
+  const { colorMode } = useColorMode();
 
   const [type, setType] = useFilter("type");
   const [rooms, setRooms] = useFilter("rooms");
@@ -61,10 +67,10 @@ export const EstateList: FC = () => {
   });
 
   useEffect(() => {
-    if (inView) {
+    if (loadMoreInView) {
       fetchNextPage();
     }
-  }, [inView, fetchNextPage]);
+  }, [loadMoreInView, fetchNextPage]);
 
   useEffect(() => {
     if (notAuthenticatedAfterInitialRefresh) {
@@ -108,65 +114,87 @@ export const EstateList: FC = () => {
     setUserAdsOnly(checked);
   };
 
+  const renderFilters = () => (
+    <>
+      <Select
+        placeholder={t("type")}
+        onChange={handleTypeChange}
+        value={type}
+        flex="150px 1 0"
+      >
+        <option value="flat">{t("flat")}</option>
+        <option value="house">{t("house")}</option>
+      </Select>
+      <Select
+        placeholder={t("rooms")}
+        onChange={handleRoomsChange}
+        value={rooms}
+        flex="150px 1 0"
+      >
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4+</option>
+      </Select>
+      <Popover>
+        <PopoverTrigger>
+          <Button flex="150px 1 0">{t("price")}</Button>
+        </PopoverTrigger>
+        <PopoverContent>
+          <PopoverArrow />
+          <PopoverBody>
+            <Formik
+              initialValues={priceInitial}
+              onSubmit={handlePriceFilterChange}
+            >
+              <Form>
+                <Flex direction="column" gap="2">
+                  <FormInput
+                    placeholder={t("from")}
+                    type="number"
+                    name="from"
+                  />
+                  <FormInput placeholder={t("to")} type="number" name="to" />
+                  <FormSubmit>{t("apply")}</FormSubmit>
+                </Flex>
+              </Form>
+            </Formik>
+          </PopoverBody>
+        </PopoverContent>
+      </Popover>
+      {authenticated && (
+        <Checkbox
+          onChange={handleUserAdsOnlyFilterChange}
+          checked={userAdsOnly}
+          defaultChecked={userAdsOnly}
+        >
+          {t("userAdsOnly")}
+        </Checkbox>
+      )}
+    </>
+  );
+
   return (
     <>
-      <Flex pb="4" gap="4" wrap="wrap">
-        <Select
-          placeholder={t("type")}
-          onChange={handleTypeChange}
-          value={type}
-          flex="150px 1 0"
-        >
-          <option value="flat">{t("flat")}</option>
-          <option value="house">{t("house")}</option>
-        </Select>
-        <Select
-          placeholder={t("rooms")}
-          onChange={handleRoomsChange}
-          value={rooms}
-          flex="150px 1 0"
-        >
-          <option value="1">1</option>
-          <option value="2">2</option>
-          <option value="3">3</option>
-          <option value="4">4+</option>
-        </Select>
-        <Popover>
-          <PopoverTrigger>
-            <Button flex="150px 1 0">{t("price")}</Button>
-          </PopoverTrigger>
-          <PopoverContent>
-            <PopoverArrow />
-            <PopoverBody>
-              <Formik
-                initialValues={priceInitial}
-                onSubmit={handlePriceFilterChange}
-              >
-                <Form>
-                  <Flex direction="column" gap="2">
-                    <FormInput
-                      placeholder={t("from")}
-                      type="number"
-                      name="from"
-                    />
-                    <FormInput placeholder={t("to")} type="number" name="to" />
-                    <FormSubmit>{t("apply")}</FormSubmit>
-                  </Flex>
-                </Form>
-              </Formik>
-            </PopoverBody>
-          </PopoverContent>
-        </Popover>
-        {authenticated && (
-          <Checkbox
-            onChange={handleUserAdsOnlyFilterChange}
-            checked={userAdsOnly}
-            defaultChecked={userAdsOnly}
-          >
-            {t("userAdsOnly")}
-          </Checkbox>
-        )}
+      <Flex pb="4" gap="4" wrap="wrap" ref={filtersRef}>
+        {renderFilters()}
       </Flex>
+      <Show above="md">
+        <Box zIndex="1" left="0" right="0" top="0" pos="fixed">
+          <Slide direction="top" in={!filtersInView}>
+            <Flex
+              gap="4"
+              wrap="wrap"
+              as={Container}
+              rounded="md"
+              shadow="md"
+              bgColor={colorMode === "dark" ? "gray.600" : "gray.100"}
+            >
+              {renderFilters()}
+            </Flex>
+          </Slide>
+        </Box>
+      </Show>
       <Flex gap="4" direction="column">
         {infiniteData?.pages.map(({ data, nextOffset }) => (
           <Fragment key={nextOffset}>
@@ -176,7 +204,7 @@ export const EstateList: FC = () => {
           </Fragment>
         ))}
         {!isLoading && hasNextPage && (
-          <Box ref={ref}>
+          <Box ref={loadMoreRef}>
             <Loader />
           </Box>
         )}
