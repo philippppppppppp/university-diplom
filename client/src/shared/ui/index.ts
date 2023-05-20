@@ -12,3 +12,4 @@ export { Loader } from "./Loader";
 export { LoadingError } from "./LoadingError";
 export { Container } from "./Container";
 export { List } from "./List";
+export { Footer } from "./Footer";
