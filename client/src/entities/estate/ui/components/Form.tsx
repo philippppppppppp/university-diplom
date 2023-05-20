@@ -7,7 +7,7 @@ import {
   FormSubmit,
   FormTextArea,
 } from "../../../../shared/ui";
-import { EstateFormValues } from "../../hooks";
+import type { EstateFormValues } from "../../types";
 import { useTranslation } from "../../../../shared/translations";
 import { array, object, string } from "yup";
 import { FormError } from "../../../../shared/ui/FormError";

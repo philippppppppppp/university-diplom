@@ -1,7 +1,7 @@
 import { Flex, Heading, Text, Badge, Tag, Box } from "@chakra-ui/react";
 import { Gallery } from "../../../shared/ui";
 import { useTranslation } from "../../../shared/translations";
-import { EstateItemInfo as EstateItemInfoType } from "../hooks";
+import type { EstateItemInfo as EstateItemInfoType } from "../types";
 import { getPriceString } from "../../../shared/getPriceString";
 import { getDateString } from "../../../shared/getDateString";
 

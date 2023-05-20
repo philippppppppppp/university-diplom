@@ -1,10 +1,10 @@
 import { FormikHelpers } from "formik";
 import {
-  EstateFormValues,
   transformEstateItemInfoToFormValues,
   useEstate,
   useUpdateEstate,
 } from "../hooks";
+import type { EstateFormValues } from "../types";
 import { Form } from "./components/Form";
 
 interface Props {

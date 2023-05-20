@@ -1,5 +1,6 @@
 import { FormikHelpers } from "formik";
-import { EstateFormValues, useCreateEstate } from "../hooks";
+import { useCreateEstate } from "../hooks";
+import type { EstateFormValues } from "../types";
 import { Form } from "./components/Form";
 
 interface Props {

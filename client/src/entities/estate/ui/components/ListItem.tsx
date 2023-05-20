@@ -9,7 +9,7 @@ import {
   CardFooter,
   Tag,
 } from "@chakra-ui/react";
-import { EstateListItem } from "../../hooks";
+import type { EstateListItem } from "../../types";
 import { Link } from "react-router-dom";
 import { useTranslation } from "../../../../shared/translations";
 import { getPriceString } from "../../../../shared/getPriceString";

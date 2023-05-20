@@ -8,45 +8,13 @@ import { gql } from "graphql-request";
 import { useApi } from "../../shared/api";
 import { toApiArray } from "../../shared/toApiArray";
 import { useAuth } from "../../shared/auth";
-
-export type EstateType = "house" | "flat";
-
-export interface EstateItemInfo {
-  id: string;
-  title: string;
-  description: string;
-  images: string[];
-  address: string;
-  priceUAH: number;
-  createdAt: string;
-  rooms: number;
-  livingAreaM2: number;
-  kitchenAreaM2: number;
-  type: EstateType;
-}
-
-export type EstateListItem = EstateItemInfo;
-
-export interface EstateItem extends EstateItemInfo {
-  author: {
-    id: string;
-    name: string;
-    phone: string;
-    lastOnline?: string;
-  };
-}
-
-export interface EstateFormValues {
-  title: string;
-  description: string;
-  images: string[];
-  address: string;
-  priceUAH: string;
-  rooms: string;
-  livingAreaM2: string;
-  kitchenAreaM2: string;
-  type: EstateType | "";
-}
+import type {
+  EstateFormValues,
+  EstateItem,
+  EstateItemInfo,
+  EstateListItem,
+  ListFilters,
+} from "./types";
 
 export const transformEstateItemInfoToFormValues = ({
   priceUAH,
@@ -70,13 +38,6 @@ export const transformEstateItemInfoToFormValues = ({
   kitchenAreaM2: kitchenAreaM2.toString(),
 });
 
-interface ListFilters {
-  type?: string;
-  rooms?: string;
-  priceFrom?: string;
-  priceTo?: string;
-}
-
 const limit = 10;
 
 const transformFiltersToQueryVariable = ({
@@ -94,6 +55,16 @@ const transformFiltersToQueryVariable = ({
     },
   }),
 });
+
+const getNextPageParam = <T extends { length: number }>(lastPage: {
+  data: T;
+  nextOffset: number;
+}) => {
+  if (!lastPage.data.length) {
+    return;
+  }
+  return lastPage.nextOffset;
+};
 
 const estateListQuery = gql`
   query ($limit: Int, $offset: Int, $filters: estate_bool_exp) {
@@ -128,12 +99,7 @@ export const useEstateList = (filters: ListFilters) => {
       });
       return { data: estate, nextOffset: offset + limit };
     },
-    getNextPageParam(lastPage) {
-      if (!lastPage.data.length) {
-        return;
-      }
-      return lastPage.nextOffset;
-    },
+    getNextPageParam,
   });
 };
 
@@ -160,12 +126,7 @@ export const useEstateFavoritesList = (filters: ListFilters) => {
       });
       return { data: estate, nextOffset: offset + limit };
     },
-    getNextPageParam(lastPage) {
-      if (!lastPage.data.length) {
-        return;
-      }
-      return lastPage.nextOffset;
-    },
+    getNextPageParam,
   });
 };
 
