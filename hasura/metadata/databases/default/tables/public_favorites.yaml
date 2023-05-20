@@ -1,0 +1,29 @@
+table:
+  schema: public
+  name: favorites
+insert_permissions:
+  - role: user
+    permission:
+      check:
+        user_id:
+          _eq: X-Hasura-User-Id
+      columns:
+        - estate_id
+        - user_id
+      backend_only: false
+select_permissions:
+  - role: user
+    permission:
+      columns:
+        - estate_id
+        - id
+        - user_id
+      filter:
+        user_id:
+          _eq: X-Hasura-User-Id
+delete_permissions:
+  - role: user
+    permission:
+      filter:
+        user_id:
+          _eq: X-Hasura-User-Id

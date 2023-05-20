@@ -7,6 +7,7 @@ import {
 import { gql } from "graphql-request";
 import { useApi } from "../../shared/api";
 import { toApiArray } from "../../shared/toApiArray";
+import { useAuth } from "../../shared/auth";
 
 export type EstateType = "house" | "flat";
 
@@ -69,63 +70,32 @@ export const transformEstateItemInfoToFormValues = ({
   kitchenAreaM2: kitchenAreaM2.toString(),
 });
 
-const estateListQuery = gql`
-  query ($filters: estate_bool_exp) {
-    estate(where: $filters) {
-      id
-      title
-      images
-      address
-      priceUAH
-      createdAt
-      description
-      rooms
-      livingAreaM2
-      kitchenAreaM2
-    }
-  }
-`;
-
-export const useEstateList = ({
-  type,
-  rooms,
-  priceFrom,
-  priceTo,
-  authorId,
-}: {
+interface ListFilters {
   type?: string;
   rooms?: string;
   priceFrom?: string;
   priceTo?: string;
-  authorId?: string | null;
-}) => {
-  const { request } = useApi();
-  return useQuery(
-    ["estate-list", type, rooms, priceFrom, priceTo, authorId],
-    async () => {
-      const { estate } = await request<{ estate: EstateListItem[] }>({
-        query: estateListQuery,
-        variables: {
-          filters: {
-            //TODO: FIX THIS
-            ...(!!type && { type: { _eq: type } }),
-            ...(!!rooms && { rooms: { _eq: rooms } }),
-            ...((!!priceFrom || !!priceTo) && {
-              priceUAH: {
-                ...(!!priceFrom && { _gte: priceFrom }),
-                ...(!!priceTo && { _lte: priceTo }),
-              },
-            }),
-            ...(!!authorId && { author_id: { _eq: authorId } }),
-          },
-        },
-      });
-      return estate;
-    }
-  );
-};
+}
 
-const estateInfiniteListQuery = gql`
+const limit = 10;
+
+const transformFiltersToQueryVariable = ({
+  priceFrom,
+  priceTo,
+  rooms,
+  type,
+}: ListFilters) => ({
+  ...(!!type && { type: { _eq: type } }),
+  ...(!!rooms && { rooms: { _eq: rooms } }),
+  ...((!!priceFrom || !!priceTo) && {
+    priceUAH: {
+      ...(!!priceFrom && { _gte: priceFrom }),
+      ...(!!priceTo && { _lte: priceTo }),
+    },
+  }),
+});
+
+const estateListQuery = gql`
   query ($limit: Int, $offset: Int, $filters: estate_bool_exp) {
     estate(limit: $limit, offset: $offset, where: $filters) {
       id
@@ -142,50 +112,51 @@ const estateInfiniteListQuery = gql`
   }
 `;
 
-const limit = 10;
-
-export const useEstateInfiniteList = ({
-  type,
-  rooms,
-  priceFrom,
-  priceTo,
-  authorId,
-}: {
-  type?: string;
-  rooms?: string;
-  priceFrom?: string;
-  priceTo?: string;
-  authorId?: string | null;
-}) => {
+export const useEstateList = (filters: ListFilters) => {
   const { request } = useApi();
   return useInfiniteQuery({
-    queryKey: [
-      "estate-list-infinite",
-      type,
-      rooms,
-      priceFrom,
-      priceTo,
-      authorId,
-    ],
+    queryKey: ["estate-list", filters],
     async queryFn({ pageParam: nextOffset }) {
       const offset = nextOffset ?? 0;
       const { estate } = await request<{ estate: EstateListItem[] }>({
-        query: estateInfiniteListQuery,
+        query: estateListQuery,
+        variables: {
+          limit,
+          offset,
+          filters: transformFiltersToQueryVariable(filters),
+        },
+      });
+      return { data: estate, nextOffset: offset + limit };
+    },
+    getNextPageParam(lastPage) {
+      if (!lastPage.data.length) {
+        return;
+      }
+      return lastPage.nextOffset;
+    },
+  });
+};
+
+export const useEstateFavoritesList = (filters: ListFilters) => {
+  const { request } = useApi();
+  const { userId } = useAuth();
+  return useInfiniteQuery({
+    queryKey: ["estate-favorites-list", filters],
+    async queryFn({ pageParam: nextOffset }) {
+      const offset = nextOffset ?? 0;
+      const { estate } = await request<{ estate: EstateListItem[] }>({
+        query: estateListQuery,
         variables: {
           limit,
           offset,
           filters: {
-            ...(!!type && { type: { _eq: type } }),
-            ...(!!rooms && { rooms: { _eq: rooms } }),
-            ...((!!priceFrom || !!priceTo) && {
-              priceUAH: {
-                ...(!!priceFrom && { _gte: priceFrom }),
-                ...(!!priceTo && { _lte: priceTo }),
-              },
-            }),
-            ...(!!authorId && { author_id: { _eq: authorId } }),
+            ...transformFiltersToQueryVariable(filters),
+            favorites: {
+              user_id: { _eq: userId },
+            },
           },
         },
+        role: "user",
       });
       return { data: estate, nextOffset: offset + limit };
     },

@@ -10,7 +10,7 @@ import {
   PopoverArrow,
   Box,
 } from "@chakra-ui/react";
-import { useEstateList } from "../hooks";
+import { useEstateFavoritesList } from "../hooks";
 import { useTranslation } from "../../../shared/translations";
 import { Formik, Form, FormikHelpers } from "formik";
 import {
@@ -29,7 +29,7 @@ interface PriceFilter {
   to: string;
 }
 
-export const EstateList: FC = () => {
+export const EstateFavoritesList: FC = () => {
   const { t } = useTranslation();
   const { ref: loadMoreRef, inView: loadMoreInView } = useInView();
 
@@ -41,11 +41,9 @@ export const EstateList: FC = () => {
     from: priceFrom,
     to: priceTo,
   };
-  // const [userAdsOnly, setUserAdsOnly] = useBooleanFilter("userAdsOnly");
-  // const [favoritesOnly, setFavoritesOnly] = useBooleanFilter("favorites");
 
   const { data, fetchNextPage, hasNextPage, isLoading, isError } =
-    useEstateList({
+    useEstateFavoritesList({
       type,
       rooms,
       priceFrom: priceFrom,
@@ -57,13 +55,6 @@ export const EstateList: FC = () => {
       fetchNextPage();
     }
   }, [loadMoreInView, fetchNextPage]);
-
-  // useEffect(() => {
-  //   if (notAuthenticatedAfterInitialRefresh) {
-  //     setUserAdsOnly(false);
-  //     setFavoritesOnly(false);
-  //   }
-  // }, [notAuthenticatedAfterInitialRefresh, setUserAdsOnly, setFavoritesOnly]);
 
   if (isLoading) {
     return <Loader />;
@@ -95,18 +86,6 @@ export const EstateList: FC = () => {
     setPriceTo(formattedPrice.to);
     setSubmitting(false);
   };
-
-  // const handleUserAdsOnlyFilterChange = (e: ChangeEvent<HTMLInputElement>) => {
-  //   const checked = e.target.checked;
-  //   setUserAdsOnly(checked);
-  // };
-
-  // const handleFavoritesOnlyFilterChange = (
-  //   e: ChangeEvent<HTMLInputElement>
-  // ) => {
-  //   const checked = e.target.checked;
-  //   setFavoritesOnly(checked);
-  // };
 
   const renderFilters = () => (
     <>
@@ -156,22 +135,6 @@ export const EstateList: FC = () => {
           </PopoverBody>
         </PopoverContent>
       </Popover>
-      {/* {authenticated && (
-        <>
-          <Checkbox
-            onChange={handleUserAdsOnlyFilterChange}
-            isChecked={userAdsOnly}
-          >
-            {t("userAdsOnly")}
-          </Checkbox>
-          <Checkbox
-            onChange={handleFavoritesOnlyFilterChange}
-            isChecked={favoritesOnly}
-          >
-            {t("favorites")}
-          </Checkbox>
-        </>
-      )} */}
     </>
   );
 

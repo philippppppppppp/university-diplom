@@ -9,7 +9,6 @@ const query = gql`
       id
       name
       email
-      favorites
     }
   }
 `;
@@ -18,7 +17,6 @@ interface Viewer {
   id: string;
   name: string;
   email: string;
-  favorites: string[];
 }
 
 export const useViewer = () => {

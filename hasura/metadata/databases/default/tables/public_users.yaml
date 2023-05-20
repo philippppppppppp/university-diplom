@@ -14,7 +14,6 @@ select_permissions:
     permission:
       columns:
         - email
-        - favorites
         - id
         - lastOnline
         - name
@@ -27,7 +26,6 @@ update_permissions:
     permission:
       columns:
         - email
-        - favorites
         - name
         - phone
       filter:

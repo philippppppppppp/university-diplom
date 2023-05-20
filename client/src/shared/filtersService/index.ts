@@ -57,5 +57,12 @@ export const useBooleanFilter = (key: string) => {
     [key, setSearchParams]
   );
 
+  useEffect(() => {
+    const paramValue = searchParams.get(key) === checkedValue;
+    if (value !== paramValue) {
+      setValue(paramValue);
+    }
+  }, [value, searchParams, key]);
+
   return [value, handleChange] as const;
 };

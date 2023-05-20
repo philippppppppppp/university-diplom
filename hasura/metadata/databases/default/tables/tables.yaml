@@ -1,2 +1,3 @@
 - "!include public_estate.yaml"
+- "!include public_favorites.yaml"
 - "!include public_users.yaml"

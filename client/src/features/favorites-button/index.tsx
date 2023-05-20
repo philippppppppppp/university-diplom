@@ -1,79 +1,154 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@chakra-ui/react";
 import { MinusIcon, StarIcon } from "@chakra-ui/icons";
 import { useApi } from "../../shared/api";
 import { gql } from "graphql-request";
 import { useAuth } from "../../shared/auth";
 import { useTranslation } from "../../shared/translations";
-import { useViewer } from "../../entities/viewer";
-import { toApiArray } from "../../shared/toApiArray";
 
-const query = gql`
-  mutation ($userId: uuid!, $favorites: _uuid) {
-    update_users_by_pk(
-      pk_columns: { id: $userId }
-      _set: { favorites: $favorites }
+const favoritesQuery = gql`
+  query ($estateId: uuid!, $userId: uuid!) {
+    favorites(
+      where: {
+        _and: { estate_id: { _eq: $estateId }, user_id: { _eq: $userId } }
+      }
     ) {
-      favorites
+      id
     }
   }
 `;
 
-const useUpdateFavorites = () => {
+const useFavorite = (estateId: string) => {
+  const { request } = useApi();
+  const { userId } = useAuth();
+  return useQuery(["favorite", { userId, estateId }], async () => {
+    const { favorites } = await request<{ favorites: { id: string }[] }>({
+      query: favoritesQuery,
+      variables: {
+        userId,
+        estateId,
+      },
+      role: "user",
+    });
+    return favorites.length > 0;
+  });
+};
+
+const addToFavoritesQuery = gql`
+  mutation ($estateId: uuid!, $userId: uuid!) {
+    insert_favorites_one(object: { estate_id: $estateId, user_id: $userId }) {
+      estate_id
+    }
+  }
+`;
+
+const useAddToFavorites = () => {
   const client = useQueryClient();
   const { userId } = useAuth();
   const { request } = useApi();
   return useMutation(
-    async (favorites: string[]) => {
-      return await request({
-        query,
+    async (estateId: string) => {
+      const { insert_favorites_one } = await request<{
+        insert_favorites_one: { estate_id: string };
+      }>({
+        query: addToFavoritesQuery,
         variables: {
           userId,
-          favorites: toApiArray(favorites),
+          estateId,
         },
         role: "user",
       });
+      return insert_favorites_one;
     },
     {
-      onSuccess() {
-        client.invalidateQueries(["viewer", userId]);
+      onSuccess({ estate_id }) {
+        client.invalidateQueries(["estate-favorites-list"]);
+        client.invalidateQueries(["favorite", { userId, estateId: estate_id }]);
+      },
+    }
+  );
+};
+
+const removeFromFavoritesQuery = gql`
+  mutation ($estateId: uuid!, $userId: uuid!) {
+    delete_favorites(
+      where: {
+        _and: { estate_id: { _eq: $estateId }, user_id: { _eq: $userId } }
+      }
+    ) {
+      returning {
+        estate_id
+      }
+    }
+  }
+`;
+
+const useRemoveFromFavorites = () => {
+  const client = useQueryClient();
+  const { userId } = useAuth();
+  const { request } = useApi();
+  return useMutation(
+    async (estateId: string) => {
+      const { delete_favorites } = await request<{
+        delete_favorites: { returning: { estate_id: string }[] };
+      }>({
+        query: removeFromFavoritesQuery,
+        variables: {
+          userId,
+          estateId,
+        },
+        role: "user",
+      });
+      return delete_favorites.returning[0];
+    },
+    {
+      onSuccess({ estate_id }) {
+        client.invalidateQueries(["estate-favorites-list"]);
+        client.invalidateQueries(["favorite", { userId, estateId: estate_id }]);
       },
     }
   );
 };
 
 interface Props {
-  id?: string;
+  id: string;
 }
 
 export const FavoritesButton: React.FC<Props> = ({ id }) => {
-  const { data: viewer } = useViewer();
   const { t } = useTranslation();
-  const { mutate } = useUpdateFavorites();
-
-  const favorite = viewer?.favorites.some((f) => f === id);
+  const { mutate: addToFavorites, isLoading: isAddToFavoritesLoading } =
+    useAddToFavorites();
+  const {
+    mutate: removeFromFavorites,
+    isLoading: isRemoveFromFavoritesLoading,
+  } = useRemoveFromFavorites();
+  const { data: favorite, isLoading } = useFavorite(id);
 
   const handleClick = () => {
-    if (!viewer || !id) {
-      return;
-    }
     if (favorite) {
-      mutate(viewer.favorites.filter((f) => f !== id));
+      removeFromFavorites(id);
+    } else {
+      addToFavorites(id);
     }
-    const set = new Set([...viewer.favorites, id]);
-    mutate(Array.from(set));
   };
+
+  const loading =
+    isLoading || isAddToFavoritesLoading || isRemoveFromFavoritesLoading;
 
   if (favorite) {
     return (
-      <Button leftIcon={<MinusIcon />} onClick={handleClick}>
+      <Button
+        leftIcon={<MinusIcon />}
+        onClick={handleClick}
+        isLoading={loading}
+      >
         {t("fromFavorites")}
       </Button>
     );
   }
 
   return (
-    <Button leftIcon={<StarIcon />} onClick={handleClick}>
+    <Button leftIcon={<StarIcon />} onClick={handleClick} isLoading={loading}>
       {t("toFavorites")}
     </Button>
   );

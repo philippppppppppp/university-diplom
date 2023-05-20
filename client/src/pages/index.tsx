@@ -11,6 +11,7 @@ import { ActivationPage } from "./activation-page";
 import { EstateListPage } from "./estate-list";
 import { CreateEstatePage } from "./create-estate";
 import { EstateItemPage } from "./estate-item";
+import { EstateFavoritesListPage } from "./estate-favorites-list";
 
 export const Routes: React.FC = () => {
   const { authenticated } = useAuth();
@@ -32,6 +33,14 @@ export const Routes: React.FC = () => {
     {
       path: "/estate",
       element: <EstateListPage />,
+    },
+    {
+      path: "/estate/favorites",
+      element: (
+        <PrivateRoute>
+          <EstateFavoritesListPage />
+        </PrivateRoute>
+      ),
     },
     {
       path: "/estate/new",
