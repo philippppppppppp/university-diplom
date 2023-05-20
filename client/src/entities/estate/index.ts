@@ -4,4 +4,5 @@ export {
   CreateEstateForm,
   UpdateEstateForm,
   EstateFavoritesList,
+  EstateCreatedByUserList,
 } from "./ui";

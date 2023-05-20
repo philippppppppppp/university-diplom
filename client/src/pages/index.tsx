@@ -12,6 +12,7 @@ import { EstateListPage } from "./estate-list";
 import { CreateEstatePage } from "./create-estate";
 import { EstateItemPage } from "./estate-item";
 import { EstateFavoritesListPage } from "./estate-favorites-list";
+import { EstateCreatedByUserListPage } from "./estate-created-by-user-list";
 
 export const Routes: React.FC = () => {
   const { authenticated } = useAuth();
@@ -39,6 +40,14 @@ export const Routes: React.FC = () => {
       element: (
         <PrivateRoute>
           <EstateFavoritesListPage />
+        </PrivateRoute>
+      ),
+    },
+    {
+      path: "/estate/my",
+      element: (
+        <PrivateRoute>
+          <EstateCreatedByUserListPage />
         </PrivateRoute>
       ),
     },

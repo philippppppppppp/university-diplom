@@ -130,6 +130,31 @@ export const useEstateFavoritesList = (filters: ListFilters) => {
   });
 };
 
+export const useEstateCreatedByUserList = (filters: ListFilters) => {
+  const { request } = useApi();
+  const { userId } = useAuth();
+  return useInfiniteQuery({
+    queryKey: ["estate-created-by-user-list", filters],
+    async queryFn({ pageParam: nextOffset }) {
+      const offset = nextOffset ?? 0;
+      const { estate } = await request<{ estate: EstateListItem[] }>({
+        query: estateListQuery,
+        variables: {
+          limit,
+          offset,
+          filters: {
+            ...transformFiltersToQueryVariable(filters),
+            author_id: { _eq: userId },
+          },
+        },
+        role: "user",
+      });
+      return { data: estate, nextOffset: offset + limit };
+    },
+    getNextPageParam,
+  });
+};
+
 const estateQuery = gql`
   query ($id: uuid!) {
     estate_by_pk(id: $id) {
