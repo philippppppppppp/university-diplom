@@ -39,7 +39,7 @@ export const AuthButton: FC<Props> = ({ withPopUp }) => {
       <Menu>
         <MenuButton as={Button}>{user?.name}</MenuButton>
         <MenuList>
-          <MenuItem as={Link} to="/estate?userAdsOnly=true">
+          <MenuItem as={Link} to="/estate/my">
             {t("myAds")}
           </MenuItem>
           <MenuItem as={Link} to="/estate/favorites">
